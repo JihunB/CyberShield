@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.env*.local
+.env.production
+.env.development
+
+# Vercel
+.vercel
+
+# Node
+node_modules/
+package-lock.json
+
+# Compiled binaries
+*.exe
+*.bin
+sprint2/agent/cybershield-agent
+sprint2/agent/cybershield-agent-arm64
+sprint2/agent/cybershield-agent-linux
+frontend/public/downloads/cybershield-agent
+frontend/public/downloads/cybershield-agent-arm64
+frontend/public/downloads/cybershield-agent-linux
+frontend/public/downloads/cybershield-agent.exe
+
+# OS
+.DS_Store
+Thumbs.db

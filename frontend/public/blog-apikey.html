@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="API Key Leaked on GitHub — 10-Minute Response | CyberShield" data-ko="API 키가 GitHub에 유출됐을 때 10분 대응 가이드 | CyberShield">API 키가 GitHub에 유출됐을 때 10분 대응 가이드 | CyberShield</title>
+<meta name="description" content="Git push 후 30초 안에 유출된 API 키가 발견됩니다. 즉각 대응 체크리스트와 재발 방지 방법.">
+<meta property="og:title" content="API 키가 GitHub에 유출됐을 때 10분 대응 가이드">
+<meta property="og:image" content="https://cyber-shield-ruby.vercel.app/og-image.png">
+<link rel="canonical" href="https://cyber-shield-ruby.vercel.app/blog/api-key-leak">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:1rem}
+.tag-ssl{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tag-email{background:rgba(77,159,255,.1);color:#4d9fff;border:1px solid rgba(77,159,255,.2)}
+.tag-code{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.tag-agent{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← 블로그</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+<div class="container">
+  <span class="post-tag tag-code" data-en="Code Security" data-ko="코드 보안">코드 보안</span>
+  
+  <h1 data-en="My API Key Was Leaked on GitHub — What to Do in the Next 10 Minutes"
+      data-ko="API 키가 GitHub에 유출됐을 때 — 향후 10분 안에 해야 할 것들">API 키가 GitHub에 유출됐을 때 — 10분 안에 해야 할 것들</h1>
+  <div class="meta">2026.04.11 · 5 min read · CyberShield</div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  <p data-en="A leaked API key is discovered by automated scanners within 30 seconds of a Git push. Depending on the key, you could face unexpected charges of thousands of dollars, data breaches, or spam being sent from your account."
+     data-ko="Git push 후 30초 안에 자동화된 스캐너가 유출된 API 키를 발견합니다. 키에 따라 수천 달러의 예상치 못한 청구, 데이터 침해, 또는 계정에서 스팸 발송이 발생할 수 있습니다.">Git push 후 30초 안에 자동화된 스캐너가 유출된 키를 발견합니다.</p>
+
+  <h2 data-en="Immediate Response (Next 10 Minutes)" data-ko="즉각 대응 (향후 10분)">즉각 대응 (향후 10분)</h2>
+  <ol>
+    <li data-en="<strong>Revoke the key immediately</strong> — Go to the service dashboard and revoke/delete the leaked key before doing anything else." data-ko="<strong>즉시 키 폐기</strong> — 다른 작업을 하기 전에 서비스 대시보드로 가서 유출된 키를 폐기/삭제하세요."><strong>즉시 키 폐기</strong> — 먼저 서비스 대시보드에서 키를 폐기/삭제하세요.</li>
+    <li data-en="<strong>Generate a new key</strong> — Create a replacement immediately so your service continues." data-ko="<strong>새 키 생성</strong> — 서비스가 계속되도록 즉시 교체 키를 만드세요."><strong>새 키 생성</strong> — 즉시 교체 키를 만드세요.</li>
+    <li data-en="<strong>Remove from Git history</strong> — Simply deleting the file is NOT enough; it remains in Git history." data-ko="<strong>Git 히스토리에서 제거</strong> — 단순히 파일을 삭제하는 것으로는 부족합니다. Git 히스토리에 남아 있습니다."><strong>Git 히스토리에서 제거</strong> — 파일 삭제만으로는 부족합니다.</li>
+    <li data-en="<strong>Check usage logs</strong> — Review API usage logs to determine if the key was used maliciously." data-ko="<strong>사용 로그 확인</strong> — API 사용 로그를 검토하여 키가 악의적으로 사용됐는지 확인하세요."><strong>사용 로그 확인</strong> — 악의적 사용 여부를 확인하세요.</li>
+  </ol>
+
+  <h2 data-en="Remove Key from Git History" data-ko="Git 히스토리에서 키 제거">Git 히스토리에서 키 제거</h2>
+  <pre><code># BFG Repo Cleaner (fastest method)
+java -jar bfg.jar --replace-text secrets.txt myrepo.git
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+git push --force</code></pre>
+
+  <h2 data-en="How to Prevent This in the Future" data-ko="향후 재발 방지 방법">향후 재발 방지 방법</h2>
+  <ul>
+    <li data-en="Use <code>.env</code> files and add them to <code>.gitignore</code>" data-ko="<code>.env</code> 파일을 사용하고 <code>.gitignore</code>에 추가하세요"><code>.env</code> 파일을 사용하고 <code>.gitignore</code>에 추가</li>
+    <li data-en="Enable <strong>GitHub Secret Scanning</strong> in repository settings" data-ko="저장소 설정에서 <strong>GitHub Secret Scanning</strong> 활성화"><strong>GitHub Secret Scanning</strong> 활성화</li>
+    <li data-en="Use pre-commit hooks with <strong>git-secrets</strong> or <strong>gitleaks</strong>" data-ko="<strong>git-secrets</strong> 또는 <strong>gitleaks</strong>를 사용한 pre-commit 훅 설정"><strong>git-secrets</strong> 또는 <strong>gitleaks</strong> pre-commit 훅</li>
+  </ul>
+
+  <div class="scan-cta">
+    <div>
+      <strong data-en="Scan your code for hardcoded secrets now" data-ko="지금 코드에 하드코딩된 시크릿 검사하기">지금 코드에 하드코딩된 시크릿 검사하기</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="14 patterns including os.getenv() fallbacks and 3rd-party service keys" data-ko="os.getenv() 폴백, 서드파티 키 등 14가지 패턴 탐지">os.getenv() 폴백, 서드파티 키 등 14가지 패턴</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔍 Scan Code File" data-ko="🔍 코드 파일 스캔">🔍 코드 파일 스캔</a>
+  </div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+
+</div>
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/">Home</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+    const t = document.querySelector('title');
+    if (t && t.getAttribute('data-' + lang)) t.textContent = t.getAttribute('data-' + lang);
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

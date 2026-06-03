@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberShield — 도메인 등록</title>
+<meta name="robots" content="noindex">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<meta name="supabase-url"  content="https://fuhbdbbnqkffqpxzopxm.supabase.co">
+<meta name="supabase-anon" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aGJkYmJucWtmZnFweHpvcHhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjcxOTIsImV4cCI6MjA5MTM0MzE5Mn0.Ip0eetKZELrGtnAz1vMiCcdtyQahyQ_VA8XdpCJQQf8">
+<meta name="api-url"       content="https://cybershield-10-production.up.railway.app">
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#050810;--bg2:#0c1220;--bg3:#111a2e;--bg4:#162035;
+  --bdr:rgba(100,160,255,0.08);--bdr2:rgba(100,160,255,0.14);--bdr3:rgba(100,160,255,0.24);
+  --text:#d4e4ff;--text2:#7a98c4;--text3:#3a5070;
+  --green:#00e5a0;--blue:#4d9fff;--red:#ff4d6a;--orange:#ffb547;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:8px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;
+     display:flex;align-items:center;justify-content:center;padding:20px}
+
+.card{
+  width:100%;max-width:480px;
+  background:var(--bg2);border:1px solid var(--bdr2);border-radius:14px;
+  padding:40px 36px;
+}
+
+.logo{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:15px;
+      font-weight:700;color:var(--text);margin-bottom:28px;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+
+h1{font-size:22px;font-weight:600;margin-bottom:6px}
+.sub{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.6}
+
+/* Steps */
+.steps{display:flex;gap:0;margin-bottom:28px}
+.step{flex:1;text-align:center;position:relative}
+.step::after{content:'';position:absolute;top:13px;right:0;width:100%;height:1px;
+             background:var(--bdr2);z-index:0}
+.step:last-child::after{display:none}
+.step-dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--bdr2);
+          background:var(--bg3);display:flex;align-items:center;justify-content:center;
+          font-family:var(--mono);font-size:10px;color:var(--text3);
+          margin:0 auto 6px;position:relative;z-index:1;transition:all .3s}
+.step.active .step-dot{border-color:var(--green);color:var(--green);background:rgba(0,229,160,.1)}
+.step.done .step-dot{border-color:var(--green);background:var(--green);color:#050810}
+.step-label{font-family:var(--mono);font-size:9px;color:var(--text3);letter-spacing:.06em}
+.step.active .step-label{color:var(--green)}
+
+/* Fields */
+.field{margin-bottom:16px}
+label{display:block;font-family:var(--mono);font-size:10px;font-weight:700;
+      color:var(--text3);letter-spacing:.08em;margin-bottom:6px}
+input,select{
+  width:100%;background:var(--bg3);border:1px solid var(--bdr2);border-radius:var(--r);
+  color:var(--text);font-family:var(--sans);font-size:14px;padding:10px 12px;
+  transition:border-color .2s;outline:none;
+}
+input:focus,select:focus{border-color:var(--bdr3)}
+input::placeholder{color:var(--text3)}
+.field-note{font-size:11px;color:var(--text3);margin-top:5px;line-height:1.5}
+
+.btn{
+  width:100%;background:var(--green);color:#050810;
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;
+  padding:12px;border-radius:var(--r);border:none;cursor:pointer;
+  transition:background .2s;margin-top:8px;
+}
+.btn:hover{background:#00ffb3}
+.btn:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed}
+.btn-secondary{
+  width:100%;background:transparent;color:var(--text2);
+  font-family:var(--mono);font-size:11px;
+  padding:10px;border-radius:var(--r);border:1px solid var(--bdr2);
+  cursor:pointer;transition:all .2s;margin-top:8px;
+}
+.btn-secondary:hover{border-color:var(--bdr3);color:var(--text)}
+
+.error{background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.25);
+       border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--red);
+       margin-bottom:14px;display:none}
+.success{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.25);
+         border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--green);
+         margin-bottom:14px;display:none}
+
+/* Section panels */
+.panel{display:none}
+.panel.active{display:block}
+
+/* Tier badges */
+.tier-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.tier-opt{background:var(--bg3);border:1.5px solid var(--bdr);border-radius:var(--r);
+          padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s}
+.tier-opt:hover{border-color:var(--bdr3)}
+.tier-opt.selected{border-color:var(--green);background:rgba(0,229,160,.07)}
+.tier-opt .tier-name{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px}
+.tier-opt .tier-price{font-size:11px;color:var(--text2)}
+.tier-opt .tier-badge{font-size:9px;font-family:var(--mono);padding:2px 6px;border-radius:4px;
+                      background:rgba(0,229,160,.15);color:var(--green);margin-top:4px;display:inline-block}
+
+/* Domain list preview */
+.domain-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);
+             border:1px solid var(--bdr2);border-radius:20px;padding:4px 12px 4px 10px;
+             font-family:var(--mono);font-size:11px;margin:3px}
+.domain-chip .chip-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
+
+.divider{display:flex;align-items:center;gap:8px;color:var(--text3);font-size:12px;margin:14px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--bdr)}
+
+/* ── Lang toggle ──────────────────────────────────────────────────────────── */
+.lang-toggle-fixed {
+  position: fixed;
+  top: 16px; right: 20px;
+  display: flex; gap: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--bdr2);
+  border-radius: 20px;
+  padding: 3px;
+  z-index: 999;
+}
+.lang-btn-fixed {
+  font-family: var(--mono);
+  font-size: 10px; font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text3);
+  letter-spacing: .05em;
+  transition: all .2s;
+}
+.lang-btn-fixed.on {
+  background: var(--green);
+  color: #050810;
+}
+</style>
+</head>
+<body>
+
+<!-- Language toggle -->
+<div class="lang-toggle-fixed">
+  <button class="lang-btn-fixed" id="lb-en" onclick="setLang('en')">EN</button>
+  <button class="lang-btn-fixed" id="lb-ko" onclick="setLang('ko')">KO</button>
+</div>
+
+<div class="card">
+  <div class="logo"><span class="logo-dot"></span>CyberShield</div>
+
+  <!-- Step progress -->
+  <div class="steps" id="steps">
+    <div class="step active" id="step-ind-1">
+      <div class="step-dot">1</div>
+      <div class="step-label" data-en="ACCOUNT" data-ko="계정">계정</div>
+    </div>
+    <div class="step" id="step-ind-2">
+      <div class="step-dot">2</div>
+      <div class="step-label" data-en="DOMAIN" data-ko="도메인">도메인</div>
+    </div>
+    <div class="step" id="step-ind-3">
+      <div class="step-dot">3</div>
+      <div class="step-label" data-en="ALERTS" data-ko="알림">알림</div>
+    </div>
+    <div class="step" id="step-ind-4">
+      <div class="step-dot">✓</div>
+      <div class="step-label" data-en="DONE" data-ko="완료">완료</div>
+    </div>
+  </div>
+
+  <!-- ── PANEL 1: Login / Sign up ──────────────────────── -->
+  <div class="panel active" id="panel-1">
+    <h1 data-en="Create Account" data-ko="계정 만들기">계정 만들기</h1>
+    <p class="sub" data-en="Sign in or create a free account to register your domain."
+       data-ko="로그인하거나 무료 계정을 만들어 도메인을 등록하세요.">로그인하거나 무료 계정을 만들어 도메인을 등록하세요.</p>
+
+    <div id="err-1" class="error"></div>
+
+    <div class="field">
+      <label data-en="EMAIL" data-ko="이메일">이메일</label>
+      <input id="inp-email" type="email" placeholder="you@company.com" autocomplete="email">
+    </div>
+    <div class="field">
+      <label data-en="PASSWORD" data-ko="비밀번호">비밀번호</label>
+      <input id="inp-pw" type="password" placeholder="••••••••" autocomplete="current-password">
+      <div class="field-note" data-en="Minimum 8 characters" data-ko="최소 8자">최소 8자</div>
+    </div>
+
+    <button class="btn" onclick="doAuth('signin')" id="btn-signin">
+      <span data-en="Sign In →" data-ko="로그인 →">로그인 →</span>
+    </button>
+    <div class="divider" data-en="or" data-ko="또는">또는</div>
+    <button class="btn" onclick="doAuth('signup')" id="btn-signup"
+            style="background:var(--bg3);color:var(--text);border:1px solid var(--bdr2)">
+      <span data-en="Create Free Account →" data-ko="무료 계정 만들기 →">무료 계정 만들기 →</span>
+    </button>
+  </div>
+
+  <!-- ── PANEL 2: Domain Registration ─────────────────── -->
+  <div class="panel" id="panel-2">
+    <h1 data-en="Register Your Domain" data-ko="도메인 등록">도메인 등록</h1>
+    <p class="sub" data-en="Enter the domain you want to monitor. We'll run the first scan immediately."
+       data-ko="모니터링할 도메인을 입력하세요. 등록 즉시 첫 스캔이 시작됩니다.">모니터링할 도메인을 입력하세요. 등록 즉시 첫 스캔이 시작됩니다.</p>
+
+    <div id="err-2" class="error"></div>
+
+    <div class="field">
+      <label data-en="DOMAIN" data-ko="도메인">도메인</label>
+      <input id="inp-domain" type="text" placeholder="example.com"
+             autocomplete="off" autocapitalize="none">
+      <div class="field-note" data-en="Enter without http:// — e.g. example.com"
+           data-ko="http:// 없이 입력하세요 — 예: example.com">http:// 없이 입력하세요</div>
+    </div>
+
+    <div class="field">
+      <label data-en="LANGUAGE" data-ko="언어">언어</label>
+      <select id="inp-lang">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+
+    <button class="btn" onclick="doRegister()" id="btn-register">
+      <span data-en="Register & Start First Scan →" data-ko="등록 후 첫 스캔 시작 →">등록 후 첫 스캔 시작 →</span>
+    </button>
+  </div>
+
+  <!-- ── PANEL 3: Alert Setup ───────────────────────────── -->
+  <div class="panel" id="panel-3">
+    <h1 data-en="Set Up Alerts" data-ko="알림 설정">알림 설정</h1>
+    <p class="sub" data-en="Get notified when your scan is done or a vulnerability is found. (Optional — you can set this later in settings.)"
+       data-ko="스캔 완료 또는 취약점 발견 시 알림을 받으세요. (선택사항 — 나중에 설정에서 변경 가능합니다.)">선택사항 — 나중에 설정에서 변경 가능합니다.</p>
+
+    <div id="err-3" class="error"></div>
+
+    <div class="field">
+      <label data-en="SLACK WEBHOOK (OPTIONAL)" data-ko="Slack 웹훅 (선택)">Slack 웹훅 (선택)</label>
+      <input id="inp-slack" type="text" placeholder="https://hooks.slack.com/services/..." autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label data-en="DISCORD WEBHOOK (OPTIONAL)" data-ko="Discord 웹훅 (선택)">Discord 웹훅 (선택)</label>
+      <input id="inp-discord" type="text" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
+      <div class="field-note">
+        <span data-en="Discord: Channel Settings → Integrations → Webhooks → New Webhook → Copy URL"
+              data-ko="Discord: 채널 편집 → 연동 → 웹후크 → 웹후크 만들기 → URL 복사">Discord: 채널 편집 → 연동 → 웹후크 만들기 → URL 복사</span>
+      </div>
+    </div>
+
+    <button class="btn" onclick="doSaveWebhooks()" id="btn-webhooks">
+      <span data-en="Save & Go to Dashboard →" data-ko="저장 후 대시보드로 →">저장 후 대시보드로 →</span>
+    </button>
+    <button class="btn-secondary" onclick="skipToDashboard()">
+      <span data-en="Skip for now" data-ko="나중에 설정">나중에 설정</span>
+    </button>
+  </div>
+
+  <!-- ── PANEL 4: Done ──────────────────────────────────── -->
+  <div class="panel" id="panel-4">
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:48px;margin-bottom:12px">✅</div>
+      <h1 data-en="All Set!" data-ko="등록 완료!">등록 완료!</h1>
+      <p class="sub" style="margin-top:8px"
+         data-en="Your domain has been registered and the first scan has started. Results will appear on your dashboard in 30–90 seconds."
+         data-ko="도메인이 등록됐고 첫 스캔이 시작됐습니다. 30~90초 후 대시보드에서 결과를 확인할 수 있습니다.">
+        30~90초 후 대시보드에서 결과를 확인할 수 있습니다.</p>
+      <div id="done-domain" class="domain-chip" style="margin:12px auto;display:inline-flex">
+        <span class="chip-dot"></span>
+        <span id="done-domain-txt">—</span>
+      </div>
+    </div>
+    <a onclick="window.location.href='/dashboard'" class="btn" 
+       style="display:block;text-align:center;text-decoration:none;padding:12px;margin-top:8px;cursor:pointer"
+       data-en="Go to Dashboard →" data-ko="대시보드로 →">대시보드로 →</a>
+  </div>
+
+</div><!-- .card -->
+
+<script>
+const SB_URL  = document.querySelector('meta[name="supabase-url"]')?.content || '';
+const SB_ANON = document.querySelector('meta[name="supabase-anon"]')?.content || '';
+const API     = (document.querySelector('meta[name="api-url"]')?.content || '').replace(/\/+$/,'');
+
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_ANON);
+
+let _userEmail = '';
+let _accessToken = '';
+let _registeredDomain = '';
+
+// ── i18n ─────────────────────────────────────────────────────────────────────
+let _lang = localStorage.getItem('cs_lang') || 'ko';
+
+function applyLang() {
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const txt = el.getAttribute('data-' + _lang);
+    if (txt) el.textContent = txt;
+  });
+  // Update button states
+  document.getElementById('lb-en')?.classList.toggle('on', _lang === 'en');
+  document.getElementById('lb-ko')?.classList.toggle('on', _lang === 'ko');
+  // Update placeholders
+  document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+    el.placeholder = el.getAttribute('data-placeholder-' + _lang) || el.placeholder;
+  });
+}
+
+function setLang(lang) {
+  _lang = lang;
+  localStorage.setItem('cs_lang', lang);
+  applyLang();
+}
+
+applyLang();
+
+// ── Step helpers ──────────────────────────────────────────────────────────────
+function goStep(n) {
+  document.querySelectorAll('.panel').forEach((p, i) => {
+    p.classList.toggle('active', i + 1 === n);
+  });
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i + 1 < n) s.classList.add('done');
+    if (i + 1 === n) s.classList.add('active');
+  });
+}
+
+function showErr(panelN, msg) {
+  const el = document.getElementById('err-' + panelN);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 6000);
+}
+
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.style.opacity = loading ? '0.6' : '1';
+}
+
+// ── Step 1: Auth ──────────────────────────────────────────────────────────────
+async function doAuth(mode) {
+  const email = document.getElementById('inp-email').value.trim();
+  const pw    = document.getElementById('inp-pw').value;
+  if (!email || pw.length < 8) {
+    showErr(1, _lang === 'ko' ? '이메일과 8자 이상 비밀번호를 입력하세요.' : 'Enter email and password (min 8 chars).');
+    return;
+  }
+
+  const btnId = mode === 'signin' ? 'btn-signin' : 'btn-signup';
+  setLoading(btnId, true);
+
+  const fn = mode === 'signin'
+    ? sb.auth.signInWithPassword({ email, password: pw })
+    : sb.auth.signUp({ email, password: pw });
+
+  const { data, error } = await fn;
+  setLoading(btnId, false);
+
+  if (error) {
+    const msgs = {
+      'Invalid login credentials': '이메일 또는 비밀번호가 올바르지 않습니다.',
+      'User already registered':   '이미 가입된 이메일입니다. 로그인을 시도하세요.',
+      'Email not confirmed':       '이메일 인증이 필요합니다. 받은 메일을 확인하세요.',
+    };
+    showErr(1, msgs[error.message] || error.message);
+    return;
+  }
+
+  if (mode === 'signup' && !data.session) {
+    // Email confirmation required
+    showErr(1, '✅ ' + (_lang === 'ko' ? '가입 완료! 이메일 확인 링크를 클릭 후 돌아오세요.' : 'Signed up! Click the confirmation link in your email.'));
+    return;
+  }
+
+  _userEmail   = data.session?.user?.email || email;
+  _accessToken = data.session?.access_token || '';
+  // Store in sessionStorage so dashboard.html auto-logs in immediately
+  if (data.session?.access_token) {
+    sessionStorage.setItem('cs_pending_token', data.session.access_token);
+  }
+  goStep(2);
+}
+
+// ── Step 2: Domain registration ───────────────────────────────────────────────
+async function doRegister() {
+  let domain = document.getElementById('inp-domain').value.trim().toLowerCase();
+  domain = domain.replace(/^https?:\/\//, '').split('/')[0].split('?')[0];
+  const lang = document.getElementById('inp-lang').value;
+
+  if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) {
+    showErr(2, _lang === 'ko' ? '올바른 도메인을 입력하세요 (예: example.com)' : 'Enter a valid domain (e.g. example.com)');
+    return;
+  }
+
+  setLoading('btn-register', true);
+
+  try {
+    const res = await fetch(API + '/customer/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: _userEmail, domain, lang }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      showErr(2, data.detail || (_lang === 'ko' ? '등록 실패. 다시 시도해주세요.' : 'Registration failed. Please try again.'));
+      setLoading('btn-register', false);
+      return;
+    }
+    _registeredDomain = domain;
+    document.getElementById('done-domain-txt').textContent = domain;
+    goStep(3);
+  } catch (e) {
+    showErr(2, _lang === 'ko' ? '서버 연결 실패. 잠시 후 다시 시도해주세요.' : 'Server error. Please try again.');
+  }
+  setLoading('btn-register', false);
+}
+
+// ── Step 3: Webhooks ──────────────────────────────────────────────────────────
+async function doSaveWebhooks() {
+  const slack   = document.getElementById('inp-slack').value.trim();
+  const discord = document.getElementById('inp-discord').value.trim();
+
+  setLoading('btn-webhooks', true);
+
+  try {
+    if ((slack || discord) && _accessToken) {
+      await fetch(API + '/customer/webhook', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + _accessToken,
+        },
+        body: JSON.stringify({ slack_webhook: slack, discord_webhook: discord }),
+      });
+    }
+  } catch (e) {
+    console.warn('Webhook save failed (non-fatal):', e);
+  }
+
+  setLoading('btn-webhooks', false);
+  goStep(4);
+  // Auto-redirect to dashboard after 2.5s
+  setTimeout(() => { window.location.href = '/dashboard'; }, 2500);
+}
+
+function skipToDashboard() {
+  window.location.href = '/dashboard';
+}
+
+// ── Auto-detect if already logged in ─────────────────────────────────────────
+// 주의: 세션이 있어도 자동으로 다음 단계로 넘기지 않음.
+// 도메인이 이미 등록돼 있으면 대시보드로만 이동.
+// 미등록이면 이메일을 미리 채워두고 사용자가 직접 버튼을 누르게 함.
+sb.auth.getSession().then(({ data }) => {
+  if (!data.session) return;  // 미로그인 → 1단계 그대로
+
+  _userEmail   = data.session.user.email || '';
+  _accessToken = data.session.access_token || '';
+
+  fetch(API + '/customer/domains', {
+    headers: { 'Authorization': 'Bearer ' + _accessToken },
+  })
+  .then(r => r.ok ? r.json() : Promise.reject(r.status))
+  .then(d => {
+    if (d.domains && d.domains.length > 0) {
+      // 이미 도메인 등록 완료 → 대시보드로 바로 이동
+      window.location.href = '/dashboard';
+    } else {
+      // 로그인은 됐지만 도메인 미등록
+      // → 이메일 필드 미리 채우고 1단계에 머무름 (자동 이동 X)
+      const emailEl = document.getElementById('inp-email');
+      if (emailEl) emailEl.value = _userEmail;
+      // 로그인 버튼을 "다음 →" 으로 바꾸고 클릭 시 바로 2단계로
+      const signinBtn = document.getElementById('btn-signin');
+      if (signinBtn) {
+        signinBtn.textContent = _lang === 'ko' ? '다음 →' : 'Next →';
+        signinBtn.onclick = () => goStep(2);
+      }
+    }
+  })
+  .catch(() => {
+    // API 오류 → 아무것도 하지 않음, 1단계 그대로 유지
+  });
+});
+
+// Enter key on password
+document.getElementById('inp-pw').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doAuth('signin');
+});
+document.getElementById('inp-domain')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') doRegister();
+});
+</script>
+</body>
+</html>

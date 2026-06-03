@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="HTTP to HTTPS Migration Guide | CyberShield" data-ko="HTTP에서 HTTPS로 완전 전환 가이드 | CyberShield">HTTP에서 HTTPS로 완전 전환 가이드 | CyberShield</title>
+<meta name="description" content="구글이 HTTP 사이트를 '안전하지 않음'으로 표시합니다. 30분 안에 HTTPS로 전환하는 완전 가이드.">
+<meta property="og:title" content="HTTP에서 HTTPS로 완전 전환 가이드">
+<meta property="og:image" content="https://cyber-shield-ruby.vercel.app/og-image.png">
+<link rel="canonical" href="https://cyber-shield-ruby.vercel.app/blog/https-migration">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:1rem}
+.tag-ssl{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tag-email{background:rgba(77,159,255,.1);color:#4d9fff;border:1px solid rgba(77,159,255,.2)}
+.tag-code{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.tag-agent{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← 블로그</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+<div class="container">
+  <span class="post-tag tag-ssl" data-en="SSL / HTTPS" data-ko="SSL / HTTPS">SSL / HTTPS</span>
+  
+  <h1 data-en="HTTP to HTTPS Migration Complete Guide — Zero Downtime"
+      data-ko="HTTP에서 HTTPS로 완전 전환 가이드 — 무중단 마이그레이션">HTTP에서 HTTPS로 완전 전환 가이드</h1>
+  <div class="meta">2026.04.11 · 6 min read · CyberShield</div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  <p data-en="Google Chrome now marks all HTTP sites as 'Not Secure'. HTTP sites rank lower in Google Search and can't process payments. If your site is still on HTTP, this guide will walk you through the migration in under 30 minutes."
+     data-ko="Google Chrome은 이제 모든 HTTP 사이트를 '안전하지 않음'으로 표시합니다. HTTP 사이트는 구글 검색 순위가 낮고 결제를 처리할 수 없습니다. 아직 HTTP를 사용 중이라면, 이 가이드로 30분 안에 전환할 수 있습니다.">Google Chrome은 모든 HTTP 사이트를 '안전하지 않음'으로 표시합니다. 30분 안에 전환하세요.</p>
+
+  <h2 data-en="Step 1: Get a Free SSL Certificate" data-ko="Step 1: 무료 SSL 인증서 발급">Step 1: 무료 SSL 인증서 발급</h2>
+  <pre><code># Certbot (Ubuntu/Debian)
+sudo apt install certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com</code></pre>
+
+  <h2 data-en="Step 2: Force HTTPS Redirect" data-ko="Step 2: HTTPS 강제 리다이렉트">Step 2: HTTPS 강제 리다이렉트</h2>
+  <pre><code># Nginx - Add to server block
+server {{
+    listen 80;
+    server_name yourdomain.com www.yourdomain.com;
+    return 301 https://$host$request_uri;
+}}</code></pre>
+
+  <h2 data-en="Step 3: Fix Mixed Content Issues" data-ko="Step 3: 혼합 콘텐츠(Mixed Content) 수정">Step 3: 혼합 콘텐츠(Mixed Content) 수정</h2>
+  <p data-en="After enabling HTTPS, your browser may block HTTP resources (images, scripts, fonts) loaded inside HTTPS pages. Find and replace all <code>http://</code> references in your HTML, CSS, and JS files."
+     data-ko="HTTPS 활성화 후, 브라우저가 HTTPS 페이지 내에서 로드되는 HTTP 리소스(이미지, 스크립트, 폰트)를 차단할 수 있습니다. HTML, CSS, JS 파일에서 모든 <code>http://</code> 참조를 찾아 교체하세요.">HTTPS 페이지 내의 HTTP 리소스는 브라우저가 차단합니다. <code>http://</code>를 모두 <code>https://</code>로 교체하세요.</p>
+
+  <h2 data-en="Step 4: Update Google Search Console" data-ko="Step 4: Google Search Console 업데이트">Step 4: Google Search Console 업데이트</h2>
+  <ol>
+    <li data-en="Add the HTTPS version of your site as a new property" data-ko="HTTPS 버전의 사이트를 새 속성으로 추가">HTTPS 버전을 새 속성으로 추가</li>
+    <li data-en="Submit the updated sitemap.xml" data-ko="업데이트된 sitemap.xml 제출">업데이트된 sitemap.xml 제출</li>
+    <li data-en="Monitor for crawl errors during the transition period" data-ko="전환 기간 동안 크롤링 오류 모니터링">크롤링 오류 모니터링</li>
+  </ol>
+
+  <div class="callout tip" data-en="<strong>✓ SEO tip:</strong> HTTPS is a direct ranking factor in Google Search. Sites using HTTPS rank higher than equivalent HTTP sites."
+       data-ko="<strong>✓ SEO 팁:</strong> HTTPS는 구글 검색의 직접적인 랭킹 요소입니다. HTTPS 사이트는 동급의 HTTP 사이트보다 검색 순위가 높습니다."><strong>✓ SEO 팁:</strong> HTTPS는 구글 검색 직접 랭킹 요소입니다.</div>
+
+  <div class="scan-cta">
+    <div>
+      <strong data-en="Check your HTTPS configuration" data-ko="HTTPS 설정 점검하기">HTTPS 설정 점검하기</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="SSL cert, HSTS, mixed content — checked in 30 seconds" data-ko="SSL 인증서, HSTS, 혼합 콘텐츠 — 30초 확인">SSL, HSTS, 혼합 콘텐츠 — 30초 확인</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔒 Free SSL Check" data-ko="🔒 무료 SSL 검사">🔒 무료 SSL 검사</a>
+  </div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+
+</div>
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/">Home</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+    const t = document.querySelector('title');
+    if (t && t.getAttribute('data-' + lang)) t.textContent = t.getAttribute('data-' + lang);
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

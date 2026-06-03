@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="Email Spoofing Prevention — SPF·DKIM·DMARC 10-Min Setup | CyberShield" data-ko="이메일 스푸핑 방지 완전 가이드 — SPF·DKIM·DMARC 10분 설정 | CyberShield">이메일 스푸핑 방지 완전 가이드 | CyberShield</title>
+<meta name="description" content="우리 회사 이름으로 피싱 이메일이 발송되고 있다면? SPF, DKIM, DMARC 설정으로 이메일 스푸핑을 완전 차단하세요. 무료로 10분이면 됩니다.">
+<meta property="og:title" content="이메일 스푸핑 방지 완전 가이드 — SPF·DKIM·DMARC 10분 설정">
+<meta property="og:image" content="https://digitalcybershield.com/og-image.png">
+<link rel="canonical" href="https://digitalcybershield.com/blog/dmarc-guide">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--info:#4d9fff;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;background:rgba(77,159,255,.1);color:#4d9fff;border:1px solid rgba(77,159,255,.2);margin-bottom:1rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}
+strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.info{background:rgba(77,159,255,.07);border:1px solid rgba(77,159,255,.2);color:var(--info)}
+.three-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.875rem;margin:1.5rem 0}
+.col-card{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1rem 1.25rem}
+.col-title{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);margin-bottom:.5rem}
+.col-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem 1.75rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" class="nav-back" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← Blog</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+
+<div class="container">
+  <span class="post-tag" data-en="Email Security" data-ko="이메일 보안">이메일 보안</span>
+  <h1 data-en="Someone Is Sending Phishing Emails Pretending to Be Your Company?<br>SPF·DKIM·DMARC 10-Minute Setup Guide" data-ko="우리 회사 이름으로 피싱 이메일이 발송되고 있다면?<br>SPF·DKIM·DMARC 10분 설정 가이드">우리 회사 이름으로 피싱 이메일이 발송되고 있다면?<br>SPF·DKIM·DMARC 10분 설정 가이드</h1>
+  <div class="meta" data-en="2026.04.10 · 7 min read · CyberShield" data-ko="2026.04.10 · 7분 읽기 · CyberShield">2026.04.10 · 7 min read · CyberShield</div>
+
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고 (AdSense 승인 후 활성화)">광고 (AdSense 승인 후 활성화)</div>
+
+  <p data-en="Has a business partner ever said, &quot;We received a strange email from your company&quot;? If customers are receiving phishing emails that look like they came from your domain, your email security is not configured." data-ko="이런 경험이 있으신가요? 거래처에서 &quot;귀사 이름으로 이상한 이메일이 왔는데요&quot;라는 연락을 받거나, 고객이 우리 도메인에서 온 것처럼 보이는 피싱 이메일을 받았다면 — 이메일 보안 설정이 되어 있지 않은 것입니다.">이런 경험이 있으신가요? 거래처에서 "귀사 이름으로 이상한 이메일이 왔는데요"라는 연락을 받거나, 고객이 우리 도메인에서 온 것처럼 보이는 피싱 이메일을 받았다면 — 이메일 보안 설정이 되어 있지 않은 것입니다.</p>
+  <p>무서운 사실은, <strong>아무 설정 없이도 누구나 your-company.com에서 보내는 척</strong> 이메일을 발송할 수 있다는 것입니다. 이 문제를 막는 것이 SPF, DKIM, DMARC 세 가지입니다.</p>
+
+  <div class="callout warn">
+    <strong>⚠ 이메일 스푸핑의 실제 피해:</strong><br>
+    • 고객에게 우리 회사를 사칭한 피싱 이메일 발송<br>
+    • 구매 요청이나 계좌이체 사기 (BEC 공격)<br>
+    • 브랜드 신뢰도 하락 및 스팸 필터에 의한 정상 이메일 차단<br>
+    • 해외 기업 피해액: 평균 수억~수십억 원
+  </div>
+
+  <h2 data-en="Understanding the 3 Email Security Settings" data-ko="세 가지 이메일 보안 설정 이해하기">세 가지 이메일 보안 설정 이해하기</h2>
+  <div class="three-cols">
+    <div class="col-card">
+      <div class="col-title">SPF</div>
+      <div class="col-desc">"우리 도메인의 이메일은 이 서버에서만 보낼 수 있다"고 명시. DNS TXT 레코드로 설정.</div>
+    </div>
+    <div class="col-card">
+      <div class="col-title">DKIM</div>
+      <div class="col-desc">이메일에 디지털 서명을 추가. 전송 중 내용이 변조되지 않았음을 증명.</div>
+    </div>
+    <div class="col-card">
+      <div class="col-title">DMARC</div>
+      <div class="col-desc">SPF·DKIM 실패 시 어떻게 처리할지 정책 설정. "차단", "스팸함", "그냥 통과" 중 선택.</div>
+    </div>
+  </div>
+
+  <h2 data-en="1. Configure SPF" data-ko="1. SPF 설정하기">1. SPF 설정하기</h2>
+  <p>DNS 관리 페이지(가비아, 후이즈, Cloudflare 등)에서 TXT 레코드를 추가합니다.</p>
+
+  <h3 data-en="For Google Workspace:" data-ko="Google Workspace를 사용하는 경우:">Google Workspace를 사용하는 경우:</h3>
+  <pre><code>TXT 레코드
+이름: @ (또는 yourdomain.com)
+값: v=spf1 include:_spf.google.com ~all</code></pre>
+
+  <h3 data-en="For Microsoft 365:" data-ko="Microsoft 365를 사용하는 경우:">Microsoft 365를 사용하는 경우:</h3>
+  <pre><code>TXT 레코드
+이름: @ (또는 yourdomain.com)
+값: v=spf1 include:spf.protection.outlook.com ~all</code></pre>
+
+  <div class="callout info">
+    <strong>💡 ~all vs -all:</strong><br>
+    <code>~all</code> = 소프트 실패 (처음에는 이걸로 시작하세요)<br>
+    <code>-all</code> = 하드 실패 (설정이 안정화되면 이걸로 변경)
+  </div>
+
+  <h2 data-en="2. Configure DKIM" data-ko="2. DKIM 설정하기">2. DKIM 설정하기</h2>
+  <p>DKIM은 이메일 제공업체(Google, Microsoft 등)에서 키를 생성한 후 DNS에 등록하는 방식입니다.</p>
+
+  <h3 data-en="Google Workspace:" data-ko="Google Workspace:">Google Workspace:</h3>
+  <ol>
+    <li>Google Admin Console → Apps → Google Workspace → Gmail</li>
+    <li>Authenticate email → DKIM 탭</li>
+    <li>"Generate new record" 클릭</li>
+    <li>생성된 TXT 레코드를 DNS에 추가</li>
+    <li>"Start authentication" 클릭</li>
+  </ol>
+
+  <h2 data-en="3. Configure DMARC" data-ko="3. DMARC 설정하기">3. DMARC 설정하기</h2>
+  <p>SPF와 DKIM 설정이 완료된 후 DMARC를 추가합니다. <code>_dmarc.yourdomain.com</code>에 TXT 레코드를 만듭니다.</p>
+
+  <h3 data-en="Step-by-Step DMARC Adoption:" data-ko="단계별 DMARC 도입 전략:">단계별 DMARC 도입 전략:</h3>
+  <pre><code># 1단계: 모니터링만 (처음 2~4주)
+v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com
+
+# 2단계: 실패 이메일 스팸 처리 (안정화 후)
+v=DMARC1; p=quarantine; rua=mailto:dmarc@yourdomain.com
+
+# 3단계: 실패 이메일 완전 차단 (최종)
+v=DMARC1; p=reject; rua=mailto:dmarc@yourdomain.com</code></pre>
+
+  <div class="callout tip">
+    <strong>✓ rua=mailto: 설정 이유:</strong> DMARC 리포트를 받으면 누가 우리 도메인을 사칭해서 이메일을 보내는지 파악할 수 있습니다. 처음에는 꼭 설정하세요.
+  </div>
+
+  <h2 data-en="Verify Your Settings" data-ko="설정 확인하기">설정 확인하기</h2>
+  <p>DNS 변경은 전파에 최대 48시간이 걸립니다. 설정 후 CyberShield로 확인해보세요:</p>
+
+  <div class="scan-cta">
+    <div>
+      <strong style="font-size:1rem" data-en="Check SPF·DKIM·DMARC Settings Instantly" data-ko="SPF·DKIM·DMARC 설정 즉시 확인">SPF·DKIM·DMARC 설정 즉시 확인</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="Domain → 30 seconds → email security score + specific fixes" data-ko="도메인 입력 → 30초 → 이메일 보안 점수 + 구체적 수정 방법">도메인 입력 → 30초 → 이메일 보안 점수 + 구체적 수정 방법</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="📧 Email Security Check" data-ko="📧 이메일 보안 검사">📧 이메일 보안 검사</a>
+  </div>
+
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고 (AdSense 승인 후 활성화)">광고 (AdSense 승인 후 활성화)</div>
+
+  <p style="font-size:13px;color:var(--text3);border-top:1px solid var(--border);padding-top:1.25rem;margin-top:2rem">
+    관련 글: <a href="/blog/ssl-guide">SSL 인증서 무료 자동 갱신 가이드</a> · <a href="/blog/ai-code-security">AI 생성 코드의 7가지 보안 취약점</a>
+  </p>
+</div>
+
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/" data-en="Home" data-ko="홈">홈</a> · <a href="/privacy" data-en="Privacy Policy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l=localStorage.getItem('cs_lang')||'ko';
+  window._setLang=function(lang){
+    localStorage.setItem('cs_lang',lang);
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      const txt=el.getAttribute('data-'+lang);
+      if(txt===null)return;
+      if(el.tagName==='INPUT')el.placeholder=txt;
+      else el.innerHTML=txt;
+    });
+    document.documentElement.lang=lang;
+    const t=document.querySelector('title');
+    if(t&&t.getAttribute('data-'+lang))t.textContent=t.getAttribute('data-'+lang);
+  };
+  document.addEventListener('DOMContentLoaded',()=>_setLang(l));
+})();
+</script>
+</body>
+</html>

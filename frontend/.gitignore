@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.env
+.env.local
+
+# Node / Vercel
+node_modules/
+.vercel/
+
+# Go binaries (generated — don't commit)
+sprint2/agent/cybershield-agent
+sprint2/agent/cybershield-agent-arm64
+sprint2/agent/cybershield-agent-linux
+sprint2/agent/cybershield-agent.exe
+
+# OS
+.DS_Store
+Thumbs.db

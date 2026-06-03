@@ -1,0 +1,99 @@
+{
+  "rewrites": [
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/dashboard/",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/register/",
+      "destination": "/register.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/contact",
+      "destination": "/contact.html"
+    },
+    {
+      "source": "/blog",
+      "destination": "/blog.html"
+    },
+    {
+      "source": "/blog/ssl-guide",
+      "destination": "/blog-ssl.html"
+    },
+    {
+      "source": "/blog/dmarc-guide",
+      "destination": "/blog-dmarc.html"
+    },
+    {
+      "source": "/blog/ai-code-security",
+      "destination": "/blog-ai.html"
+    },
+    {
+      "source": "/blog/open-ports-guide",
+      "destination": "/blog-ports.html"
+    },
+    {
+      "source": "/blog/ransomware-prevention",
+      "destination": "/blog-ransomware.html"
+    },
+    {
+      "source": "/blog/https-migration",
+      "destination": "/blog-https.html"
+    },
+    {
+      "source": "/blog/password-security",
+      "destination": "/blog-password.html"
+    },
+    {
+      "source": "/blog/api-key-leak",
+      "destination": "/blog-apikey.html"
+    },
+    {
+      "source": "/blog/waf-setup-guide",
+      "destination": "/blog-waf.html"
+    },
+    {
+      "source": "/blog/zero-trust-security",
+      "destination": "/blog-zerotrust.html"
+    },
+    {
+      "source": "/blog/cloud-storage-security",
+      "destination": "/blog-cloudstorage.html"
+    },
+    {
+      "source": "/blog/social-engineering-defense",
+      "destination": "/blog-socialeng.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/downloads/(.*)",
+      "headers": [
+        {
+          "key": "Content-Disposition",
+          "value": "attachment"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
+  ]
+}

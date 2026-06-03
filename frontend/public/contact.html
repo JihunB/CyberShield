@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문의하기 | Contact | CyberShield</title>
+<meta name="description" content="CyberShield 문의 — 보안 스캔, 에이전트, 기업 도입 관련 문의">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif;--r:10px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;min-height:100vh}
+nav{display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;border-bottom:1px solid var(--border);background:rgba(8,12,16,.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.nav-back{font-size:12px;color:var(--text2);text-decoration:none;transition:color .2s}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+
+.container{max-width:680px;margin:0 auto;padding:3rem 1.5rem 5rem}
+h1{font-size:1.8rem;font-weight:600;margin-bottom:.5rem}
+.sub{font-size:15px;color:var(--text2);margin-bottom:2.5rem;line-height:1.7}
+.contact-card{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.75rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:1.25rem}
+.contact-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.contact-title{font-size:15px;font-weight:500;margin-bottom:4px}
+.contact-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.cta-email{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:13px;font-weight:700;padding:12px 24px;border-radius:var(--r);text-decoration:none;margin-top:1.5rem;transition:background .2s}
+.cta-email:hover{background:#00ffb3;text-decoration:none}
+
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/" class="nav-back" data-en="← Home" data-ko="← 홈으로">← 홈으로</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1 data-en="Contact" data-ko="문의하기">문의하기</h1>
+  <p class="sub"
+     data-en="Have a question or need help? Contact us below.<br>We typically respond within 1–2 business days."
+     data-ko="질문이 있으시거나 도움이 필요하신가요? 아래로 연락해 주세요.<br>보통 1~2 영업일 이내 답변드립니다.">
+    질문이 있으시거나 도움이 필요하신가요? 아래로 연락해 주세요.<br>보통 1~2 영업일 이내 답변드립니다.
+  </p>
+
+  <div class="contact-card">
+    <div class="contact-icon">✉️</div>
+    <div>
+      <div class="contact-title" data-en="General Inquiries" data-ko="일반 문의">일반 문의</div>
+      <div class="contact-desc" data-en="Questions about the service, features, or security report inquiries" data-ko="서비스 이용, 기능 관련 질문, 보안 리포트 문의">서비스 이용, 기능 관련 질문, 버그 리포트</div>
+      <a href="mailto:general@jihun.me" style="font-size:14px;display:block;margin-top:6px">general@jihun.me</a>
+    </div>
+  </div>
+
+  <div class="contact-card">
+    <div class="contact-icon">💼</div>
+    <div>
+      <div class="contact-title" data-en="Enterprise &amp; Partnership" data-ko="기업 도입 · 파트너십">기업 도입 · 파트너십</div>
+      <div class="contact-desc" data-en="Plus/Max plan adoption, custom security solutions, partnership inquiries" data-ko="Plus/Max 플랜 도입, 맞춤형 보안 솔루션, 파트너십 문의">Plus/Max 플랜 도입, 맞춤형 솔루션, 파트너십</div>
+      <a href="mailto:general@jihun.me" style="font-size:14px;display:block;margin-top:6px">general@jihun.me</a>
+    </div>
+  </div>
+
+  <div class="contact-card">
+    <div class="contact-icon">🤖</div>
+    <div>
+      <div class="contact-title" data-en="Agent Support" data-ko="에이전트 설치 지원">에이전트 설치 지원</div>
+      <div class="contact-desc"
+           data-en='Agent installation errors, Windows/macOS compatibility issues, alert configuration. First check the <a href="/install">Install Guide</a>.'
+           data-ko='에이전트 설치 오류, Windows/macOS 호환성 문제, 알림 설정 도움. 먼저 <a href="/install">설치 가이드</a>를 확인해 주세요.'>
+        에이전트 설치 오류, 호환성 문제, 알림 설정. 먼저 <a href="/install">설치 가이드</a>를 확인해 주세요.
+      </div>
+      <a href="mailto:general@jihun.me" style="font-size:14px;display:block;margin-top:6px">general@jihun.me</a>
+    </div>
+  </div>
+
+  <a href="mailto:general@jihun.me" class="cta-email" data-en="📧 Send Email" data-ko="📧 이메일 보내기">📧 이메일 보내기</a>
+  <p style="font-size:12px;color:var(--text3);margin-top:1rem"
+     data-en="Average response time: 1–2 business days"
+     data-ko="평균 응답 시간: 1~2 영업일">평균 응답 시간: 1~2 영업일</p>
+</div>
+
+<footer>© 2026 CyberShield · <a href="/">Home</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a> · <a href="/terms" data-en="Terms" data-ko="이용약관">이용약관</a></footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

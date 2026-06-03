@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="5 Social Engineering Attacks & How to Train Your Team | CyberShield" data-ko="소셜 엔지니어링 공격 5가지와 직원 교육 방법 | CyberShield">소셜 엔지니어링 공격 5가지와 직원 교육 방법 | CyberShield</title>
+<meta name="description" content="사이버 공격의 98%가 소셜 엔지니어링에 의존합니다. 피싱, 비싱, USB 미끼 등 5가지 공격 유형과 팀 교육 방법을 설명합니다.">
+<meta property="og:image" content="https://digitalcybershield.com/og-image.png">
+<link rel="canonical" href="https://digitalcybershield.com/blog/social-engineering-defense">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--info:#4d9fff;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:1rem}
+.tag-ssl{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tag-agent{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+.tag-code{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← 블로그</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+<div class="container">
+  <span class="post-tag tag-agent" data-en="Security Awareness" data-ko="보안 인식">보안 인식</span>
+  <h1 data-en="5 Social Engineering Attacks & How to Train Your Team" data-ko="소셜 엔지니어링 공격 5가지와 직원 교육 방법">소셜 엔지니어링 공격 5가지와 직원 교육 방법</h1>
+  <div class="meta" data-en="2026.04.15 · CyberShield" data-ko="2026.04.15 · CyberShield">2026.04.15 · CyberShield</div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  
+  <p data-en="98% of cyber attacks rely on social engineering. The best firewall in the world won't protect you from an employee who clicks a phishing link. Here's how attackers manipulate people — and how to train your team to recognize it."
+     data-ko="사이버 공격의 98%는 소셜 엔지니어링에 의존합니다. 세계 최고의 방화벽도 직원이 피싱 링크를 클릭하면 무용지물입니다. 공격자들이 사람을 조종하는 방법과 팀이 이를 인식할 수 있도록 교육하는 방법을 소개합니다.">
+    사이버 공격의 98%는 소셜 엔지니어링에 의존합니다.</p>
+
+  <h2 data-en="5 Social Engineering Attacks You Need to Know" data-ko="알아야 할 소셜 엔지니어링 공격 5가지">알아야 할 소셜 엔지니어링 공격 5가지</h2>
+  <ol>
+    <li data-en="<strong>Phishing</strong> — fake emails that look exactly like legitimate ones (PayPal, bank, CEO). The #1 attack vector." data-ko="<strong>피싱</strong> — 합법적인 이메일처럼 보이는 가짜 이메일 (PayPal, 은행, CEO 사칭). 1위 공격 벡터."><strong>피싱</strong> — CEO나 은행을 사칭한 가짜 이메일. 가장 흔한 공격 방법</li>
+    <li data-en="<strong>Spear phishing</strong> — targeted phishing using your personal info (name, job title, recent activity)" data-ko="<strong>스피어 피싱</strong> — 개인 정보(이름, 직책, 최근 활동)를 이용한 표적형 피싱"><strong>스피어 피싱</strong> — 개인 정보를 이용한 표적형 피싱</li>
+    <li data-en="<strong>Vishing</strong> — voice phishing. Caller pretends to be IT support: &quot;I need your password to fix a security issue.&quot;" data-ko="<strong>비싱</strong> — 음성 피싱. 전화로 IT 지원팀 사칭: &quot;보안 문제를 해결하려면 비밀번호가 필요합니다.&quot;"><strong>비싱</strong> — IT 지원팀을 사칭한 전화 피싱</li>
+    <li data-en="<strong>Pretexting</strong> — creating a false scenario to extract information (&quot;I'm from compliance, I need to verify your credentials&quot;)" data-ko="<strong>프리텍스팅</strong> — 거짓 시나리오를 만들어 정보 추출 (&quot;감사팀인데 자격증명 확인이 필요합니다&quot;)"><strong>프리텍스팅</strong> — 거짓 시나리오로 정보 추출</li>
+    <li data-en="<strong>USB baiting</strong> — leaving infected USB drives in parking lots or lobbies. Curiosity kills security." data-ko="<strong>USB 미끼</strong> — 주차장이나 로비에 감염된 USB 드라이브를 놔두는 방식. 호기심이 보안을 죽입니다."><strong>USB 미끼</strong> — 주차장이나 로비에 감염된 USB 드라이브를 놔두는 방식</li>
+  </ol>
+
+  <h2 data-en="How to Train Your Team (Free Methods)" data-ko="팀 교육 방법 (무료 방법)">팀 교육 방법 (무료 방법)</h2>
+  <ul>
+    <li data-en="<strong>Run simulated phishing tests</strong> — Google Workspace has built-in phishing simulation tools" data-ko="<strong>피싱 시뮬레이션 테스트 실시</strong> — Google Workspace에는 내장 피싱 시뮬레이션 도구가 있습니다"><strong>피싱 시뮬레이션 테스트</strong> — Google Workspace 내장 도구 활용</li>
+    <li data-en="<strong>Establish a &quot;call back to verify&quot; rule</strong> — any unexpected request for credentials must be verified via a separate channel" data-ko="<strong>&quot;콜백으로 확인&quot; 규칙 수립</strong> — 자격증명에 대한 예상치 못한 요청은 별도 채널로 확인 필수"><strong>"콜백으로 확인" 규칙</strong> — 모든 예상치 못한 자격증명 요청은 별도 채널로 확인</li>
+    <li data-en="<strong>Never share passwords over phone/email</strong> — no legitimate IT support ever asks for this" data-ko="<strong>전화/이메일로 비밀번호 공유 절대 금지</strong> — 합법적인 IT 지원팀은 절대 이것을 요구하지 않습니다"><strong>전화/이메일로 비밀번호 공유 절대 금지</strong></li>
+  </ul>
+
+  <div class="callout danger" data-en="<strong>⚠ Red flag:</strong> Any message creating urgency — &quot;Your account will be suspended&quot;, &quot;Act within 24 hours&quot; — is almost always a social engineering attack."
+       data-ko="<strong>⚠ 경고 신호:</strong> 긴박감을 조성하는 모든 메시지 — &quot;계정이 정지됩니다&quot;, &quot;24시간 내 조치 필요&quot; — 는 거의 항상 소셜 엔지니어링 공격입니다.">
+    <strong>⚠ 경고 신호:</strong> "계정이 정지됩니다", "24시간 내 조치 필요" 같은 긴박감 조성 메시지는 거의 항상 공격입니다.</div>
+
+  <div class="scan-cta">
+    <div>
+      <strong data-en="Check if your domain can be spoofed" data-ko="내 도메인이 사칭될 수 있는지 확인">내 도메인이 사칭될 수 있는지 확인</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="SPF/DKIM/DMARC check — prevents attackers from sending emails as your company" data-ko="SPF/DKIM/DMARC 확인 — 공격자가 귀사 이름으로 이메일을 발송하는 것을 방지">SPF/DKIM/DMARC 확인 — 공격자가 귀사 이름으로 이메일을 발송하는 것을 방지</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="📧 Email Security Check" data-ko="📧 이메일 보안 검사">📧 이메일 보안 검사</a>
+  </div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+
+</div>
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/" data-en="Home" data-ko="홈">홈</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l=localStorage.getItem('cs_lang')||'ko';
+  window._setLang=function(lang){
+    localStorage.setItem('cs_lang',lang);
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      const txt=el.getAttribute('data-'+lang);
+      if(txt===null)return;
+      if(el.tagName==='INPUT')el.placeholder=txt;
+      else el.innerHTML=txt;
+    });
+    document.documentElement.lang=lang;
+    const t=document.querySelector('title');
+    if(t&&t.getAttribute('data-'+lang))t.textContent=t.getAttribute('data-'+lang);
+  };
+  document.addEventListener('DOMContentLoaded',()=>_setLang(l));
+})();
+</script>
+</body>
+</html>

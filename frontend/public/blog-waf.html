@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="WAF Setup Guide — Free Options for SMBs | CyberShield" data-ko="웹 방화벽(WAF) 설정 가이드 — 중소기업용 무료 옵션 | CyberShield">웹 방화벽(WAF) 설정 가이드 — 중소기업용 무료 옵션 | CyberShield</title>
+<meta name="description" content="Cloudflare 무료 WAF로 SQL 인젝션, XSS, DDoS를 차단하세요. 설정 10분이면 됩니다.">
+<meta property="og:image" content="https://cyber-shield-ruby.vercel.app/og-image.png">
+<link rel="canonical" href="https://cyber-shield-ruby.vercel.app/blog/waf-setup-guide">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:1rem}
+.tag-ssl{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tag-code{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.tag-agent{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← 블로그</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+<div class="container">
+  <span class="post-tag tag-ssl" data-en="Web Firewall (WAF)" data-ko="웹 방화벽 (WAF)">웹 방화벽 (WAF)</span>
+  
+  <h1 data-en="WAF (Web Application Firewall) Setup Guide — Free Options for SMBs"
+      data-ko="웹 방화벽(WAF) 설정 가이드 — 중소기업용 무료 옵션">웹 방화벽(WAF) 설정 가이드</h1>
+  <div class="meta">2026.04.11 · 6 min read · CyberShield</div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  <p data-en="A WAF (Web Application Firewall) sits between your website and the internet, blocking SQL injection, XSS, and DDoS attacks before they reach your server. Cloudflare offers a free WAF that handles 95% of common attacks."
+     data-ko="WAF(웹 방화벽)는 웹사이트와 인터넷 사이에 위치하여 SQL 인젝션, XSS, DDoS 공격이 서버에 도달하기 전에 차단합니다. Cloudflare는 일반적인 공격의 95%를 처리하는 무료 WAF를 제공합니다.">WAF는 SQL 인젝션, XSS, DDoS를 서버에 도달하기 전에 차단합니다.</p>
+
+  <h2 data-en="Free WAF Options" data-ko="무료 WAF 옵션">무료 WAF 옵션</h2>
+  <h3 data-en="Option 1: Cloudflare (Recommended)" data-ko="옵션 1: Cloudflare (권장)">옵션 1: Cloudflare (권장)</h3>
+  <p data-en="Cloudflare's free plan includes automatic HTTPS, DDoS protection, and basic WAF rules. Setting it up takes about 10 minutes."
+     data-ko="Cloudflare 무료 플랜에는 자동 HTTPS, DDoS 방어, 기본 WAF 규칙이 포함됩니다. 설정에는 약 10분이 소요됩니다.">Cloudflare 무료 플랜: 자동 HTTPS + DDoS 방어 + 기본 WAF. 설정 10분.</p>
+  <ol>
+    <li data-en="Sign up at cloudflare.com and add your domain" data-ko="cloudflare.com에서 가입하고 도메인 추가">cloudflare.com에서 가입 후 도메인 추가</li>
+    <li data-en="Update your domain's nameservers at your registrar" data-ko="도메인 등록업체에서 네임서버 변경">도메인 등록업체에서 네임서버 변경</li>
+    <li data-en="Security → WAF → Enable Managed Ruleset" data-ko="Security → WAF → Managed Ruleset 활성화">Security → WAF → Managed Ruleset 활성화</li>
+    <li data-en="Security → Settings → Security Level: Medium" data-ko="Security → Settings → Security Level: Medium으로 설정">Security Level: Medium 설정</li>
+  </ol>
+
+  <h3 data-en="Option 2: ModSecurity (Self-hosted)" data-ko="옵션 2: ModSecurity (자체 호스팅)">옵션 2: ModSecurity (자체 호스팅)</h3>
+  <pre><code># Nginx + ModSecurity (Ubuntu)
+sudo apt install libnginx-mod-security2
+sudo cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+# Edit: SecRuleEngine DetectionOnly → SecRuleEngine On
+sudo systemctl restart nginx</code></pre>
+
+  <h2 data-en="Key Attack Patterns WAF Blocks" data-ko="WAF가 차단하는 주요 공격 패턴">WAF가 차단하는 주요 공격 패턴</h2>
+  <ul>
+    <li data-en="<strong>SQL Injection</strong> — <code>' OR 1=1--</code> type attacks" data-ko="<strong>SQL 인젝션</strong> — <code>' OR 1=1--</code> 유형의 공격"><strong>SQL 인젝션</strong></li>
+    <li data-en="<strong>XSS (Cross-Site Scripting)</strong> — <code>&lt;script&gt;alert()&lt;/script&gt;</code> injection" data-ko="<strong>XSS</strong> — <code>&lt;script&gt;</code> 인젝션"><strong>XSS (크로스 사이트 스크립팅)</strong></li>
+    <li data-en="<strong>DDoS</strong> — Rate limiting prevents your server from being overwhelmed" data-ko="<strong>DDoS</strong> — 요청 속도 제한으로 서버 과부하 방지"><strong>DDoS</strong> — 속도 제한으로 서버 보호</li>
+    <li data-en="<strong>Path Traversal</strong> — <code>../../../etc/passwd</code> file access attempts" data-ko="<strong>경로 순회</strong> — <code>../../../etc/passwd</code> 접근 시도"><strong>경로 순회 공격</strong></li>
+  </ul>
+
+  <div class="callout tip" data-en="<strong>✓ Cloudflare tip:</strong> After enabling WAF, monitor 'Security Events' for the first week. If legitimate traffic is being blocked, create custom 'Allow' rules for those IPs."
+       data-ko="<strong>✓ Cloudflare 팁:</strong> WAF 활성화 후 첫 주 동안 'Security Events'를 모니터링하세요. 정상 트래픽이 차단되면 해당 IP에 대한 사용자 정의 '허용' 규칙을 만드세요."><strong>✓ Cloudflare 팁:</strong> WAF 활성화 후 첫 주는 Security Events를 모니터링하세요.</div>
+
+  <div class="scan-cta">
+    <div>
+      <strong data-en="Check your current security headers" data-ko="현재 보안 헤더 설정 확인">현재 보안 헤더 설정 확인</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="CSP, X-Frame-Options, and 10 more HTTP headers checked" data-ko="CSP, X-Frame-Options 등 10개 HTTP 헤더 즉시 확인">CSP, X-Frame-Options 등 10개 헤더 즉시 확인</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔍 Free Security Scan" data-ko="🔍 무료 보안 검사">🔍 무료 보안 검사</a>
+  </div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+
+</div>
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/">Home</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+    const t = document.querySelector('title');
+    if (t && t.getAttribute('data-' + lang)) t.textContent = t.getAttribute('data-' + lang);
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

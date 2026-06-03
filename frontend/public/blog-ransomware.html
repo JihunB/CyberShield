@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="Ransomware Prevention Guide for SMBs | CyberShield" data-ko="중소기업 랜섬웨어 완전 예방 가이드 | CyberShield">중소기업 랜섬웨어 완전 예방 가이드 | CyberShield</title>
+<meta name="description" content="랜섬웨어 공격의 40%가 RDP에서 시작됩니다. 실제로 작동하는 방어 전략 10가지를 설명합니다.">
+<meta property="og:title" content="중소기업 랜섬웨어 완전 예방 가이드">
+<meta property="og:image" content="https://cyber-shield-ruby.vercel.app/og-image.png">
+<link rel="canonical" href="https://cyber-shield-ruby.vercel.app/blog/ransomware-prevention">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:1rem}
+.tag-ssl{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tag-email{background:rgba(77,159,255,.1);color:#4d9fff;border:1px solid rgba(77,159,255,.2)}
+.tag-code{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.tag-agent{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← 블로그</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+<div class="container">
+  <span class="post-tag tag-agent" data-en="Ransomware Security" data-ko="랜섬웨어 보안">랜섬웨어 보안</span>
+  
+  <h1 data-en="Ransomware Prevention Guide for SMBs — 10 Defenses That Actually Work"
+      data-ko="중소기업 랜섬웨어 완전 예방 가이드 — 실제로 작동하는 방어 전략 10가지">중소기업 랜섬웨어 완전 예방 가이드</h1>
+  <div class="meta">2026.04.11 · 7 min read · CyberShield</div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  <p data-en="In 2024, the average ransom payment by SMBs reached $1.54 million. More critically, 60% of small businesses that experience a ransomware attack close within 6 months. Yet most attacks are entirely preventable."
+     data-ko="2024년 중소기업의 평균 랜섬웨어 몸값 지불액은 154만 달러에 달했습니다. 더 심각한 것은, 랜섬웨어 공격을 받은 중소기업의 60%가 6개월 이내에 폐업한다는 사실입니다. 그러나 대부분의 공격은 완전히 예방 가능합니다.">2024년 중소기업의 평균 랜섬웨어 몸값은 154만 달러, 공격받은 기업의 60%가 6개월 내 폐업합니다. 대부분은 예방 가능합니다.</p>
+
+  <h2 data-en="How Ransomware Gets In" data-ko="랜섬웨어가 침투하는 경로">랜섬웨어가 침투하는 경로</h2>
+  <ul>
+    <li data-en="<strong>RDP brute force (Port 3389)</strong> — 40% of attacks start here" data-ko="<strong>RDP 무차별 대입 (포트 3389)</strong> — 전체 공격의 40%가 여기서 시작"><strong>RDP 무차별 대입 (포트 3389)</strong> — 전체 공격의 40%</li>
+    <li data-en="<strong>Phishing emails</strong> — 35% of attacks" data-ko="<strong>피싱 이메일</strong> — 전체 공격의 35%"><strong>피싱 이메일</strong> — 전체 공격의 35%</li>
+    <li data-en="<strong>Unpatched software vulnerabilities</strong> — 15%" data-ko="<strong>패치되지 않은 소프트웨어 취약점</strong> — 15%"><strong>패치되지 않은 소프트웨어</strong> — 15%</li>
+    <li data-en="<strong>Compromised credentials / password reuse</strong> — 10%" data-ko="<strong>유출된 자격증명 / 비밀번호 재사용</strong> — 10%"><strong>유출된 자격증명</strong> — 10%</li>
+  </ul>
+
+  <h2 data-en="10 Defenses That Actually Work" data-ko="실제로 작동하는 방어 전략 10가지">실제로 작동하는 방어 전략 10가지</h2>
+  <h3 data-en="1. Close RDP or Put It Behind VPN" data-ko="1. RDP 포트를 닫거나 VPN 뒤로 숨기기">1. RDP 포트를 닫거나 VPN 뒤로 숨기기</h3>
+  <p data-en="Port 3389 open to the internet is the single biggest ransomware risk. If you must use RDP, deploy a VPN and restrict 3389 to VPN IPs only."
+     data-ko="인터넷에 열린 포트 3389는 랜섬웨어의 가장 큰 단일 위험 요소입니다. RDP를 사용해야 한다면 VPN을 배포하고 3389 포트를 VPN IP로만 제한하세요.">포트 3389를 인터넷에 열어두는 것은 랜섬웨어의 가장 큰 위험 요소입니다.</p>
+
+  <h3 data-en="2. Offline Backups (3-2-1 Rule)" data-ko="2. 오프라인 백업 — 3-2-1 규칙">2. 오프라인 백업 — 3-2-1 규칙</h3>
+  <p data-en="3 copies, 2 different media types, 1 stored offline. Ransomware encrypts networked drives — an offline backup is your last line of defense."
+     data-ko="3개 복사본, 2가지 다른 미디어, 1개 오프라인 보관. 랜섬웨어는 네트워크 드라이브를 암호화합니다. 오프라인 백업이 마지막 방어선입니다.">3개 복사본, 2가지 미디어, 1개 오프라인. 오프라인 백업이 마지막 방어선입니다.</p>
+
+  <h3 data-en="3. Enforce MFA Everywhere" data-ko="3. 모든 곳에 MFA(2단계 인증) 적용">3. 모든 곳에 MFA(2단계 인증) 적용</h3>
+  <p data-en="Even if credentials are leaked, MFA stops 99.9% of automated attacks (Microsoft data)."
+     data-ko="자격증명이 유출되더라도 MFA는 자동화 공격의 99.9%를 차단합니다 (Microsoft 데이터).">MFA는 자동화 공격의 99.9%를 차단합니다.</p>
+
+  <h3 data-en="4. Patch Within 72 Hours" data-ko="4. 패치는 72시간 이내">4. 패치는 72시간 이내</h3>
+  <p data-en="Most ransomware exploits vulnerabilities that already have patches available. Enable automatic updates for OS and critical software."
+     data-ko="대부분의 랜섬웨어는 이미 패치가 나온 취약점을 악용합니다. OS와 주요 소프트웨어의 자동 업데이트를 활성화하세요.">대부분의 공격은 이미 패치가 나온 취약점을 악용합니다.</p>
+
+  <div class="callout danger"
+       data-en="<strong>⚠ Do NOT pay the ransom.</strong> 92% of businesses that pay never fully recover their data. Payment funds the next attack."
+       data-ko="<strong>⚠ 몸값을 지불하지 마세요.</strong> 몸값을 지불한 기업의 92%가 데이터를 완전히 복구하지 못합니다. 지불은 다음 공격에 자금을 지원하는 것입니다."><strong>⚠ 몸값을 지불하지 마세요.</strong> 지불한 기업의 92%가 데이터를 완전히 복구하지 못합니다.</div>
+
+  <div class="scan-cta">
+    <div>
+      <strong data-en="Is your server at ransomware risk?" data-ko="내 서버가 랜섬웨어 위험에 노출돼 있나요?">내 서버가 랜섬웨어 위험에 노출돼 있나요?</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="RDP port, open databases, malware flags — checked in 30 seconds" data-ko="RDP 포트, 오픈 DB, 악성코드 — 30초 안에 확인">RDP 포트, 오픈 DB, 악성코드 — 30초 안에 확인</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔍 Free Scan" data-ko="🔍 무료 스캔">🔍 무료 스캔</a>
+  </div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+
+</div>
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/">Home</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+    const t = document.querySelector('title');
+    if (t && t.getAttribute('data-' + lang)) t.textContent = t.getAttribute('data-' + lang);
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

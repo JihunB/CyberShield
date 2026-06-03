@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>CyberShield — Free Website Security Scanner | Check SSL, Ports & Email Security</title>
+<meta name="description" content="Free instant security scan for your website. Check SSL certificate, open ports, email security (SPF/DKIM/DMARC), DNS, and malware flags in 30 seconds. No sign-up required. Trusted by SMBs worldwide.">
+<meta name="keywords" content="website security scanner, free SSL checker, open port scanner, email security check, DMARC checker, SPF check, website vulnerability scanner, security score, cybersecurity tool">
+<meta name="robots" content="index, follow">
+<meta name="author" content="CyberShield">
+
+<!-- Open Graph / Facebook / KakaoTalk / Discord thumbnail -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://digitalcybershield.com/">
+<meta property="og:title" content="CyberShield — Free Website Security Scanner">
+<meta property="og:description" content="Check SSL, open ports, email security & malware in 30 seconds. Free vulnerability scan for your domain — no sign-up required.">
+<meta property="og:image" content="https://digitalcybershield.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="CyberShield">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://digitalcybershield.com/">
+<meta name="twitter:title" content="CyberShield — Free Website Security Scanner">
+<meta name="twitter:description" content="Check SSL, open ports, email security & malware in 30 seconds. Free — no sign-up required.">
+<meta name="twitter:image" content="https://digitalcybershield.com/og-image.png">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://digitalcybershield.com/">
+<meta name="google-site-verification" content="eMKij6Nw_Ief7CEz39x3OWhL6Zo2Cvg83U0PEUDKquE" />
+
+<!-- Schema.org structured data for Google -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CyberShield",
+  "url": "https://digitalcybershield.com",
+  "description": "Free instant website security scanner. Check SSL, ports, email security, DNS vulnerabilities and malware flags in 30 seconds.",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "SSL/TLS certificate check",
+    "Open port scanning",
+    "Email security (SPF/DKIM/DMARC)",
+    "DNS security analysis",
+    "VirusTotal malware reputation check",
+    "Source code security scan"
+  ]
+}
+</script>
+<meta name="api-url" content="https://cybershield-10-production.up.railway.app/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080c10;--bg2:#0d1319;--bg3:#111820;--bg4:#161f28;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--border3:rgba(255,255,255,0.2);
+  --text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;
+  --accent:#00e5a0;--accent2:#007a52;--accent3:rgba(0,229,160,0.1);
+  --danger:#ff4d6a;--warn:#ffb547;--info:#4d9fff;--purple:#a78bfa;
+  --mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif;
+  --r:10px;--r2:14px;
+}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--sans);font-size:16px;line-height:1.6;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,229,160,0.012) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,160,0.012) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+
+/* ── Typography helpers ── */
+h1,h2,h3{font-weight:500;letter-spacing:-0.02em;color:var(--text)}
+p{color:var(--text2)}
+
+/* ── Nav ── */
+nav{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.25rem;height:56px;
+  background:rgba(8,12,16,0.92);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);
+  display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);
+  animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.nav-right{display:flex;align-items:center;gap:.75rem}
+.nav-links{display:flex;gap:1rem}
+.nav-links a{color:var(--text2);font-size:13px;text-decoration:none;
+  transition:color .2s;white-space:nowrap}
+.nav-links a:hover{color:var(--text)}
+.lang-toggle{display:flex;gap:2px;background:var(--bg3);
+  border:1px solid var(--border2);border-radius:6px;overflow:hidden}
+.lang-btn{padding:4px 9px;font-size:11px;font-family:var(--mono);
+  background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+@media(max-width:480px){.nav-links{display:none}}
+
+/* ── Hero ── */
+.hero{position:relative;z-index:1;padding:3.5rem 1.25rem 2.5rem;text-align:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--accent);
+  background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.18);
+  padding:5px 13px;border-radius:20px;margin-bottom:1.25rem
+}
+.hero h1{
+  font-size:clamp(1.7rem,5vw,3rem);line-height:1.15;
+  margin-bottom:1rem;max-width:700px;margin-left:auto;margin-right:auto
+}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero-sub{
+  font-size:clamp(.9rem,2.5vw,1.05rem);color:var(--text2);
+  max-width:500px;margin:0 auto 2.25rem;line-height:1.75
+}
+
+/* ── Scan box ── */
+.scan-box{
+  max-width:640px;margin:0 auto;
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:18px;padding:1.5rem;
+  position:relative;
+}
+.scan-box::before{
+  content:'';position:absolute;top:-1px;left:12%;right:12%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent)
+}
+
+/* ── Mode tabs (URL / File) ── */
+.mode-tabs{display:flex;gap:4px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:var(--r);padding:3px;margin-bottom:1.25rem}
+.mode-tab{flex:1;padding:8px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;
+  background:transparent;border:none;color:var(--text3);cursor:pointer;
+  border-radius:7px;transition:all .2s;text-align:center}
+.mode-tab.on{background:var(--bg4);color:var(--accent);border:1px solid var(--border2)}
+
+/* ── Input row ── */
+.input-row{display:flex;gap:8px;margin-bottom:.875rem}
+.scan-input{
+  flex:1;background:var(--bg3);border:1px solid var(--border2);
+  border-radius:var(--r);padding:0 .875rem;height:50px;
+  color:var(--text);font-family:var(--mono);font-size:13px;
+  outline:none;transition:border-color .2s,box-shadow .2s;min-width:0
+}
+.scan-input::placeholder{color:var(--text3)}
+.scan-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,160,.1)}
+.scan-btn{
+  height:50px;padding:0 1.25rem;flex-shrink:0;
+  background:var(--accent);color:var(--bg);
+  border:none;border-radius:var(--r);
+  font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;
+  cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:7px;transition:background .2s,transform .1s
+}
+.scan-btn:hover{background:#00ffb3}
+.scan-btn:active{transform:scale(.98)}
+.scan-btn:disabled{background:var(--accent2);cursor:not-allowed}
+
+/* ── File upload area ── */
+.file-area{
+  border:1.5px dashed var(--border2);border-radius:var(--r2);
+  padding:1.5rem;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;margin-bottom:.875rem
+}
+.file-area:hover,.file-area.drag{border-color:var(--accent);background:var(--accent3)}
+.file-area input{display:none}
+.file-icon{font-size:28px;margin-bottom:.5rem;display:block}
+.file-area p{font-size:13px;color:var(--text2);margin-bottom:.25rem}
+.file-area small{font-family:var(--mono);font-size:10px;color:var(--text3)}
+.file-selected{
+  background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);
+  padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--accent);
+  margin-bottom:.875rem;display:none
+}
+
+/* ── Scan meta chips ── */
+.scan-meta{display:flex;flex-wrap:wrap;gap:.625rem}
+.scan-chip{
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;color:var(--text3);
+  background:var(--bg3);border:1px solid var(--border);
+  padding:3px 9px;border-radius:20px
+}
+.chip-dot{width:4px;height:4px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* ── Progress ── */
+#scan-progress{display:none;margin-top:1.25rem}
+.steps{display:flex;flex-direction:column;gap:7px}
+.step{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--text3);transition:color .3s}
+.step.active{color:var(--accent)}
+.step.done{color:var(--text2)}
+.step-icon{
+  width:17px;height:17px;border-radius:50%;flex-shrink:0;
+  background:var(--bg3);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:9px;
+  transition:all .3s
+}
+.step.active .step-icon{background:rgba(0,229,160,.12);border-color:var(--accent);color:var(--accent)}
+.step.done .step-icon{background:rgba(0,229,160,.08);border-color:var(--accent2);color:var(--accent)}
+.prog-wrap{height:2px;background:var(--bg3);border-radius:2px;margin-top:.875rem;overflow:hidden}
+.prog-bar{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease;width:0}
+
+/* ── Results ── */
+#scan-results{display:none;margin-top:1.25rem}
+.result-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.score-circle{
+  width:76px;height:76px;border-radius:50%;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  border:2px solid var(--accent);background:rgba(0,229,160,.04)
+}
+.score-num{font-family:var(--mono);font-size:26px;font-weight:700;line-height:1}
+.score-lbl{font-size:10px;color:var(--text2);font-family:var(--mono);margin-top:1px}
+.result-meta{flex:1;min-width:160px}
+.result-domain{font-family:var(--mono);font-size:12px;color:var(--text2);margin-bottom:4px}
+.result-summary{font-size:13px;color:var(--text);line-height:1.55}
+.result-grade{font-family:var(--mono);font-size:22px;font-weight:700;margin-left:auto;flex-shrink:0}
+
+.findings{display:flex;flex-direction:column;gap:7px;margin-bottom:1.25rem}
+.finding{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;
+  display:flex;align-items:flex-start;gap:10px;
+  min-width:0;overflow:hidden
+}
+.sev{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.1em;padding:3px 7px;border-radius:4px;flex-shrink:0;margin-top:2px;
+  white-space:nowrap;display:inline-block
+}
+.sev-critical{background:rgba(255,77,106,.14);color:var(--danger);border:1px solid rgba(255,77,106,.28)}
+.sev-high{background:rgba(255,181,71,.11);color:var(--warn);border:1px solid rgba(255,181,71,.24)}
+.sev-medium{background:rgba(77,159,255,.09);color:var(--info);border:1px solid rgba(77,159,255,.2)}
+.sev-low{background:rgba(167,139,250,.09);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.f-body{min-width:0;flex:1}
+.f-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;line-height:1.4;word-break:break-word}
+.f-desc{font-size:12px;color:var(--text2);line-height:1.6;word-break:break-word}
+.f-fix{font-size:11px;color:var(--accent);margin-top:5px;line-height:1.5;word-break:break-word}
+.f-line{font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:4px}
+
+/* ── Gate (email unlock) ── */
+.gate{
+  background:rgba(0,229,160,.04);border:1px dashed rgba(0,229,160,.22);
+  border-radius:var(--r2);padding:1.25rem;text-align:center
+}
+.gate h3{font-size:14px;font-weight:500;margin-bottom:5px}
+.gate p{font-size:12px;color:var(--text2);margin-bottom:.875rem}
+.email-row{display:flex;gap:7px}
+.email-input{
+  flex:1;height:42px;background:var(--bg);border:1px solid var(--border2);
+  border-radius:8px;padding:0 11px;color:var(--text);
+  font-family:var(--sans);font-size:13px;outline:none;transition:border-color .2s;min-width:0
+}
+.email-input:focus{border-color:var(--accent)}
+.email-btn{
+  height:42px;padding:0 .875rem;flex-shrink:0;
+  background:var(--accent);color:var(--bg);border:none;
+  border-radius:8px;font-family:var(--mono);font-size:11px;font-weight:700;
+  cursor:pointer;white-space:nowrap;transition:background .2s
+}
+.email-btn:hover{background:#00ffb3}
+
+/* ── Scan again ── */
+.again-btn{
+  width:100%;margin-top:.875rem;padding:10px;
+  background:transparent;border:1px solid var(--border2);border-radius:var(--r);
+  color:var(--text2);font-family:var(--mono);font-size:11px;
+  cursor:pointer;transition:all .2s
+}
+.again-btn:hover{background:var(--bg3);color:var(--text)}
+
+/* ── Stats ── */
+.stats{
+  display:flex;justify-content:center;flex-wrap:wrap;gap:1.75rem 2.5rem;
+  padding:2.5rem 1.25rem;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  position:relative;z-index:1
+}
+.stat{text-align:center}
+.stat-num{font-family:var(--mono);font-size:1.75rem;font-weight:700;color:var(--accent)}
+.stat-lbl{font-size:12px;color:var(--text2);margin-top:2px;max-width:140px;line-height:1.4}
+
+/* ── Section wrapper ── */
+.section{padding:3.5rem 1.25rem;max-width:1060px;margin:0 auto;position:relative;z-index:1}
+.sec-eye{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--accent);margin-bottom:.6rem}
+.sec-title{font-size:clamp(1.35rem,3vw,2rem);margin-bottom:.6rem}
+.sec-sub{font-size:.95rem;color:var(--text2);max-width:480px;margin-bottom:2.25rem;line-height:1.7}
+
+/* ── Checks grid ── */
+.checks-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.875rem}
+.check-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:1.25rem;
+  transition:border-color .2s,transform .2s
+}
+.check-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.check-icon{
+  width:38px;height:38px;border-radius:9px;
+  background:rgba(0,229,160,.07);border:1px solid rgba(0,229,160,.14);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;margin-bottom:.875rem
+}
+.check-title{font-size:14px;font-weight:500;margin-bottom:5px}
+.check-desc{font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:.625rem}
+.check-items{display:flex;flex-direction:column;gap:3px}
+.ci{
+  font-family:var(--mono);font-size:10px;color:var(--text3);
+  display:flex;align-items:baseline;gap:5px
+}
+.ci::before{content:'›';color:var(--accent);font-size:13px;flex-shrink:0}
+.tier-pill{
+  display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;
+  padding:2px 7px;border-radius:4px;margin-left:5px;vertical-align:middle
+}
+.pill-plus{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.pill-max{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+
+/* ── Pricing ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.875rem;margin-top:2.25rem}
+.pc{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--r2);padding:1.5rem;
+  display:flex;flex-direction:column
+}
+.pc.featured{border:1px solid rgba(0,229,160,.32);background:rgba(0,229,160,.025)}
+.tier-badge{
+  display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;
+  letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:.875rem;align-self:flex-start
+}
+.tb-free{background:rgba(138,154,176,.1);color:var(--text2);border:1px solid var(--border2)}
+.tb-plus{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tb-max{background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.2)}
+.pc-name{font-size:18px;font-weight:500;margin-bottom:3px}
+.pc-price{font-family:var(--mono);font-size:1.75rem;font-weight:700;margin-bottom:.25rem}
+.pc-price span{font-size:13px;font-weight:400;color:var(--text2)}
+.pc-desc{font-size:12px;color:var(--text2);margin-bottom:1.25rem;line-height:1.6}
+.pc-features{flex:1;display:flex;flex-direction:column;gap:7px;margin-bottom:1.25rem}
+.pf{font-size:12px;color:var(--text2);display:flex;align-items:flex-start;gap:7px;line-height:1.45}
+.pf-check{color:var(--accent);font-size:13px;flex-shrink:0;margin-top:1px}
+.pc-cta{
+  display:block;text-align:center;padding:10px;border-radius:var(--r);
+  font-family:var(--mono);font-size:12px;font-weight:700;
+  text-decoration:none;cursor:pointer;border:none;transition:all .2s
+}
+.cta-out{background:transparent;border:1px solid var(--border2);color:var(--text)}
+.cta-out:hover{border-color:var(--accent);color:var(--accent)}
+.cta-fill{background:var(--accent);color:var(--bg)}
+.cta-fill:hover{background:#00ffb3}
+.cta-purple{background:rgba(167,139,250,.12);color:var(--purple);border:1px solid rgba(167,139,250,.28)}
+.cta-purple:hover{background:rgba(167,139,250,.22)}
+.perf-note{
+  margin-top:1.25rem;padding:1.1rem 1.25rem;
+  background:rgba(0,229,160,.03);border:1px solid rgba(0,229,160,.14);
+  border-radius:var(--r2);display:flex;align-items:flex-start;gap:.875rem
+}
+.perf-icon{font-size:20px;flex-shrink:0;margin-top:1px}
+.perf-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.perf-body{font-size:12px;color:var(--text2);line-height:1.6}
+
+/* ── Footer ── */
+footer{
+  border-top:1px solid var(--border);padding:2.5rem 1.25rem;
+  max-width:1060px;margin:0 auto;
+  display:flex;flex-wrap:wrap;gap:1.5rem;align-items:center;
+  justify-content:space-between;position:relative;z-index:1
+}
+.footer-logo{font-family:var(--mono);font-size:14px;color:var(--accent)}
+.footer-links{display:flex;flex-wrap:wrap;gap:1.25rem}
+.footer-links a{font-size:12px;color:var(--text2);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--text)}
+.footer-copy{font-size:11px;color:var(--text3);width:100%}
+
+/* ── Utils ── */
+.err{color:var(--danger);font-size:11px;font-family:var(--mono);margin-top:6px}
+.ok{color:var(--accent);font-size:11px;font-family:var(--mono);margin-top:6px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="#checks" data-en="What we check" data-ko="검사 항목">What we check</a>
+      <a href="#pricing" data-en="Pricing" data-ko="요금제">Pricing</a>
+      <a href="/register" data-en="Get Started" data-ko="시작하기" style="color:var(--accent);font-weight:500">시작하기</a>
+      <a href="/dashboard" data-en="Dashboard" data-ko="대시보드" style="color:var(--text2);font-size:13px">Dashboard</a>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn on" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('ko')">KO</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="eyebrow">
+    <span class="logo-dot" style="width:5px;height:5px"></span>
+    <span data-en="FREE INSTANT SCAN — NO SIGN-UP" data-ko="무료 즉시 스캔 — 가입 불필요">FREE INSTANT SCAN — NO SIGN-UP</span>
+  </div>
+  <h1 data-en="Is your website <em>actually</em> secure?" data-ko="내 웹사이트, <em>정말</em> 안전한가요?">Is your website <em>actually</em> secure?</h1>
+  <p class="hero-sub" data-en="AI-built websites have 3× more security flaws. Scan your domain or upload your code — get results in 30 seconds." data-ko="AI로 만든 웹사이트는 보안 취약점이 3배 많습니다. 도메인을 입력하거나 코드를 업로드해 30초 안에 결과를 확인하세요.">AI-built websites have 3× more security flaws. Scan your domain or upload your code — get results in 30 seconds.</p>
+
+  <!-- Scan Box -->
+  <div class="scan-box">
+
+    <!-- Mode toggle -->
+    <div class="mode-tabs">
+      <button class="mode-tab on" id="tab-url" onclick="setMode('url')" data-en="🌐 URL / Domain" data-ko="🌐 URL / 도메인">🌐 URL / Domain</button>
+      <button class="mode-tab" id="tab-file" onclick="setMode('file')" data-en="📄 Upload Code File" data-ko="📄 코드 파일 업로드">📄 Upload Code File</button>
+    </div>
+
+    <!-- URL mode -->
+    <div id="mode-url">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:.625rem;letter-spacing:.07em" data-en="ENTER YOUR DOMAIN" data-ko="도메인을 입력하세요">ENTER YOUR DOMAIN</div>
+      <div class="input-row">
+        <input class="scan-input" id="domain-input" type="text"
+          placeholder="yourdomain.com"
+          autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button class="scan-btn" id="scan-btn" onclick="startDomainScan()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <span data-en="SCAN" data-ko="스캔">SCAN</span>
+        </button>
+      </div>
+      <div id="url-error" class="err" style="display:none"></div>
+      <div class="scan-meta">
+        <span class="scan-chip"><span class="chip-dot"></span>SSL &amp; TLS</span>
+        <span class="scan-chip"><span class="chip-dot"></span><span data-en="HTTP headers" data-ko="HTTP 헤더">HTTP headers</span></span>
+        <span class="scan-chip"><span class="chip-dot"></span><span data-en="Email security" data-ko="이메일 보안">Email security</span></span>
+        <span class="scan-chip"><span class="chip-dot"></span>DNS</span>
+        <span class="scan-chip"><span class="chip-dot"></span><span data-en="Open ports" data-ko="오픈 포트">Open ports</span></span>
+        <span class="scan-chip"><span class="chip-dot"></span>VirusTotal</span>
+      </div>
+    </div>
+
+    <!-- File mode -->
+    <div id="mode-file" style="display:none">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:.625rem;letter-spacing:.07em" data-en="UPLOAD SOURCE FILE" data-ko="소스 파일 업로드">UPLOAD SOURCE FILE</div>
+      <div class="file-area" id="file-drop" onclick="document.getElementById('file-input').click()"
+        ondragover="ev.preventDefault();this.classList.add('drag')"
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <input type="file" id="file-input" accept=".py,.js,.ts,.jsx,.tsx,.go,.rb,.php,.java,.kt,.cs,.rs,.txt" onchange="handleFile(this.files[0])">
+        <span class="file-icon">📄</span>
+        <p data-en="Click to choose a file or drag &amp; drop here" data-ko="파일을 선택하거나 여기에 드래그하세요">Click to choose a file or drag &amp; drop here</p>
+        <small data-en="Python · JavaScript · TypeScript · Go · PHP · Java · and more · Max 500 KB" data-ko="Python · JavaScript · TypeScript · Go · PHP · Java · 기타 · 최대 500 KB">Python · JavaScript · TypeScript · Go · PHP · Java · and more · Max 500 KB</small>
+      </div>
+      <div class="file-selected" id="file-selected"></div>
+      <button class="scan-btn" id="file-scan-btn" onclick="startFileScan()" style="width:100%;justify-content:center">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 4v2.5l1.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span data-en="ANALYZE CODE" data-ko="코드 분석">ANALYZE CODE</span>
+      </button>
+      <div id="file-error" class="err" style="display:none"></div>
+      <div style="margin-top:.875rem">
+        <div class="scan-meta">
+          <span class="scan-chip"><span class="chip-dot"></span><span data-en="Hardcoded secrets" data-ko="하드코딩된 시크릿">Hardcoded secrets</span></span>
+          <span class="scan-chip"><span class="chip-dot"></span>SQL injection</span>
+          <span class="scan-chip"><span class="chip-dot"></span>JWT / Auth</span>
+          <span class="scan-chip"><span class="chip-dot"></span>CORS</span>
+          <span class="scan-chip"><span class="chip-dot"></span>Debug mode</span>
+          <span class="scan-chip"><span class="chip-dot"></span><span data-en="Unsafe deserialization" data-ko="안전하지 않은 역직렬화">Unsafe deserialization</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div id="scan-progress">
+      <div class="steps">
+        <div class="step" id="step-1"><div class="step-icon">—</div><span id="step-1-txt"></span></div>
+        <div class="step" id="step-2"><div class="step-icon">—</div><span id="step-2-txt"></span></div>
+        <div class="step" id="step-3"><div class="step-icon">—</div><span id="step-3-txt"></span></div>
+        <div class="step" id="step-4"><div class="step-icon">—</div><span id="step-4-txt"></span></div>
+        <div class="step" id="step-5"><div class="step-icon">—</div><span id="step-5-txt"></span></div>
+      </div>
+      <div class="prog-wrap"><div class="prog-bar" id="prog-bar"></div></div>
+    </div>
+
+    <!-- Results -->
+    <div id="scan-results">
+      <div class="result-header">
+        <div class="score-circle" id="score-circle">
+          <div class="score-num" id="score-num">—</div>
+          <div class="score-lbl">/100</div>
+        </div>
+        <div class="result-meta">
+          <div class="result-domain" id="result-label"></div>
+          <div class="result-summary" id="result-summary"></div>
+        </div>
+        <div class="result-grade" id="result-grade">—</div>
+      </div>
+      <div class="findings" id="findings-list"></div>
+      <div class="gate" id="gate-box">
+        <h3 data-en="Get your full report" data-ko="전체 리포트 받기">Get your full report</h3>
+        <p data-en="Enter your email to receive the complete vulnerability list + fix guide (free PDF)." data-ko="이메일을 입력하면 전체 취약점 목록 + 수정 가이드 PDF를 무료로 받을 수 있습니다.">Enter your email to receive the complete vulnerability list + fix guide (free PDF).</p>
+        <div class="email-row">
+          <input class="email-input" id="email-input" type="email" placeholder="you@company.com">
+          <button class="email-btn" onclick="submitEmail()" data-en="SEND" data-ko="발송">SEND</button>
+        </div>
+        <div id="email-msg"></div>
+      </div>
+      <button class="again-btn" onclick="resetScan()" data-en="← Scan another domain or file" data-ko="← 다른 도메인 또는 파일 스캔">← Scan another domain or file</button>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat"><div class="stat-num">43%</div><div class="stat-lbl" data-en="of cyberattacks target SMBs" data-ko="사이버 공격의 43%가 중소기업 타깃">of cyberattacks target SMBs</div></div>
+  <div class="stat"><div class="stat-num">3×</div><div class="stat-lbl" data-en="more flaws in AI-generated code" data-ko="AI 생성 코드의 보안 취약점 3배">more flaws in AI-generated code</div></div>
+  <div class="stat"><div class="stat-num">30s</div><div class="stat-lbl" data-en="average scan time" data-ko="평균 스캔 소요 시간">average scan time</div></div>
+  <div class="stat"><div class="stat-num">11+</div><div class="stat-lbl" data-en="code vulnerability patterns detected" data-ko="탐지하는 코드 취약점 패턴">code vulnerability patterns detected</div></div>
+</div>
+
+<!-- Agent CTA Banner -->
+<div style="background:linear-gradient(135deg,rgba(0,229,160,0.08),rgba(0,229,160,0.03));border-top:1px solid rgba(0,229,160,0.15);border-bottom:1px solid rgba(0,229,160,0.15);padding:2rem 1.25rem;text-align:center;position:relative;z-index:1">
+  <div style="max-width:640px;margin:0 auto">
+    <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--accent);margin-bottom:.6rem" data-en="NEW — SPRINT 2" data-ko="NEW — SPRINT 2">NEW — SPRINT 2</div>
+    <h3 style="font-size:clamp(1.1rem,3vw,1.5rem);font-weight:500;margin-bottom:.5rem" data-en="Domain Security Scanner" data-ko="도메인 보안 스캐너">Domain Security Scanner</h3>
+    <p style="font-size:.9rem;color:var(--text2);margin-bottom:1.25rem;line-height:1.6" data-en="Runs silently on your server. Detects brute-force logins, new open ports, and malicious IP connections in real time." data-ko="서버에서 조용히 실행됩니다. 무차별 대입 로그인, 새로운 포트 오픈, 악성 IP 연결을 실시간으로 감지합니다.">Runs silently on your server. Detects brute-force logins, new open ports, and malicious IP connections in real time.</p>
+    <a href="/register" style="display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.05em;padding:12px 24px;border-radius:8px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='#00ffb3'" onmouseout="this.style.background='var(--accent)'">
+      <span>🛡</span>
+      <span data-en="SCAN YOUR DOMAIN FREE — 1 MIN SETUP" data-ko="무료 도메인 스캔 — 1분 완료">SCAN YOUR DOMAIN FREE — 1 MIN SETUP</span>
+    </a>
+    <div style="margin-top:.75rem;font-size:11px;color:var(--text3)" data-en="macOS · Windows · Linux · No credit card required" data-ko="macOS · Windows · Linux · 신용카드 불필요">macOS · Windows · Linux · No credit card required</div>
+  </div>
+</div>
+
+<!-- What we check -->
+<section class="section" id="checks">
+  <div class="sec-eye" data-en="WHAT WE CHECK" data-ko="검사 항목">WHAT WE CHECK</div>
+  <h2 class="sec-title" data-en="Every critical attack surface, covered." data-ko="모든 핵심 공격 경로를 커버합니다.">Every critical attack surface, covered.</h2>
+  <p class="sec-sub" data-en="Free scans cover the top 5 categories instantly. Plus and Max add deep CVE analysis and AI code pattern detection." data-ko="무료 스캔은 5개 핵심 영역을 즉시 확인합니다. Plus·Max에서 심층 CVE 분석과 AI 코드 패턴 탐지가 추가됩니다.">Free scans cover the top 5 categories instantly. Plus and Max add deep CVE analysis and AI code pattern detection.</p>
+
+  <div class="checks-grid">
+    <div class="check-card">
+      <div class="check-icon">🔒</div>
+      <div class="check-title" data-en="SSL / TLS" data-ko="SSL / TLS">SSL / TLS</div>
+      <div class="check-desc" data-en="Certificate validity and expiry, HTTPS availability, HSTS enforcement." data-ko="인증서 유효성·만료일, HTTPS 지원 여부, HSTS 적용 확인.">Certificate validity and expiry, HTTPS availability, HSTS enforcement.</div>
+      <div class="check-items">
+        <div class="ci" data-en="Expiry &amp; auto-renewal" data-ko="만료일 및 자동 갱신">Expiry &amp; auto-renewal</div>
+        <div class="ci" data-en="HSTS header" data-ko="HSTS 헤더">HSTS header</div>
+        <div class="ci" data-en="Self-signed / invalid cert" data-ko="자기서명 / 잘못된 인증서">Self-signed / invalid cert</div>
+      </div>
+    </div>
+
+    <div class="check-card">
+      <div class="check-icon">🌐</div>
+      <div class="check-title" data-en="HTTP Security Headers" data-ko="HTTP 보안 헤더">HTTP Security Headers</div>
+      <div class="check-desc" data-en="Six browser security headers checked: CSP, X-Frame-Options, CORS, MIME type, referrer policy, and server version disclosure." data-ko="CSP, X-Frame-Options, MIME 타입, 리퍼러 정책, 서버 버전 노출 등 6개 보안 헤더 검사.">Six browser security headers checked: CSP, X-Frame-Options, CORS, MIME type, referrer policy, and server version disclosure.</div>
+      <div class="check-items">
+        <div class="ci">Content-Security-Policy</div>
+        <div class="ci">X-Frame-Options</div>
+        <div class="ci" data-en="Server version leak" data-ko="서버 버전 노출">Server version leak</div>
+      </div>
+    </div>
+
+    <div class="check-card">
+      <div class="check-icon">📧</div>
+      <div class="check-title" data-en="Email Security" data-ko="이메일 보안">Email Security</div>
+      <div class="check-desc" data-en="SPF, DKIM, and DMARC records — the three pillars that stop email spoofing and phishing using your domain." data-ko="SPF, DKIM, DMARC — 귀사 도메인을 이용한 이메일 스푸핑과 피싱을 차단하는 세 가지 핵심 설정.">SPF, DKIM, and DMARC records — the three pillars that stop email spoofing and phishing using your domain.</div>
+      <div class="check-items">
+        <div class="ci">SPF record</div>
+        <div class="ci">DKIM signing</div>
+        <div class="ci">DMARC policy enforcement</div>
+      </div>
+    </div>
+
+    <div class="check-card">
+      <div class="check-icon">🔍</div>
+      <div class="check-title" data-en="Open Ports &amp; DNS" data-ko="오픈 포트 &amp; DNS">Open Ports &amp; DNS</div>
+      <div class="check-desc" data-en="Eleven risky ports probed — databases, RDP, Redis, MongoDB, Elasticsearch. DNS also checked for DNSSEC and dangling CNAMEs." data-ko="DB, RDP, Redis, MongoDB, Elasticsearch 등 11개 위험 포트 탐지. DNSSEC·미연결 CNAME 등 DNS 보안도 확인.">Eleven risky ports probed — databases, RDP, Redis, MongoDB, Elasticsearch. DNS also checked for DNSSEC and dangling CNAMEs.</div>
+      <div class="check-items">
+        <div class="ci" data-en="DB ports (MySQL, Postgres, Mongo, Redis)" data-ko="DB 포트 (MySQL, Postgres, Mongo, Redis)">DB ports (MySQL, Postgres, Mongo, Redis)</div>
+        <div class="ci">DNSSEC</div>
+        <div class="ci" data-en="Dangling CNAME takeover risk" data-ko="미연결 CNAME 탈취 위험">Dangling CNAME takeover risk</div>
+      </div>
+    </div>
+
+    <div class="check-card">
+      <div class="check-icon">🦠</div>
+      <div class="check-title" data-en="Malware &amp; Reputation (VirusTotal)" data-ko="악성코드 &amp; 평판 (VirusTotal)">Malware &amp; Reputation (VirusTotal)</div>
+      <div class="check-desc" data-en="Your domain is cross-checked against 90+ security vendors via VirusTotal. Malicious flags, suspicious scores, phishing categories, and reputation scores all reported." data-ko="VirusTotal의 90개 이상 보안 벤더와 도메인을 대조합니다. 악성·의심 분류, 피싱 카테고리, 평판 점수를 모두 보고합니다.">Your domain is cross-checked against 90+ security vendors via VirusTotal. Malicious flags, suspicious scores, phishing categories, and reputation scores all reported.</div>
+      <div class="check-items">
+        <div class="ci" data-en="Malicious / suspicious vendor flags" data-ko="악성·의심 벤더 분류">Malicious / suspicious vendor flags</div>
+        <div class="ci" data-en="Phishing &amp; malware categories" data-ko="피싱·악성코드 카테고리">Phishing &amp; malware categories</div>
+        <div class="ci" data-en="Domain reputation score" data-ko="도메인 평판 점수">Domain reputation score</div>
+      </div>
+    </div>
+
+    <div class="check-card" style="border-color:rgba(0,229,160,.18);background:rgba(0,229,160,.018)">
+      <div class="check-icon">🤖</div>
+      <div class="check-title">
+        <span data-en="CVE &amp; Code Analysis" data-ko="CVE &amp; 코드 분석">CVE &amp; Code Analysis</span>
+        <span class="tier-pill pill-plus">PLUS</span>
+        <span class="tier-pill pill-max">MAX</span>
+      </div>
+      <div class="check-desc" data-en="Deep vulnerability scanning powered by Shodan CVE database (Plus/Max subscribers). Code file upload scans for 11 critical patterns including AI-generated code flaws." data-ko="Shodan CVE 데이터베이스를 활용한 심층 취약점 스캔 (Plus·Max 구독자). 코드 파일 업로드로 AI 생성 코드 취약 패턴 등 11가지 탐지.">Deep vulnerability scanning powered by Shodan CVE database (Plus/Max subscribers). Code file upload scans for 11 critical patterns including AI-generated code flaws.</div>
+      <div class="check-items">
+        <div class="ci"><span data-en="Shodan CVE database (Plus/Max only)" data-ko="Shodan CVE 데이터베이스 (Plus·Max 전용)">Shodan CVE database (Plus/Max only)</span></div>
+        <div class="ci"><span data-en="Hardcoded secrets, SQL injection, JWT" data-ko="하드코딩된 시크릿, SQL 인젝션, JWT">Hardcoded secrets, SQL injection, JWT</span></div>
+        <div class="ci"><span data-en="CORS wildcard, debug mode, eval() abuse" data-ko="CORS 와일드카드, 디버그 모드, eval() 남용">CORS wildcard, debug mode, eval() abuse</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="section" id="pricing">
+  <div class="sec-eye" data-en="PRICING" data-ko="요금제">PRICING</div>
+  <h2 class="sec-title" data-en="Start free. Go deeper when you need to." data-ko="무료로 시작하고, 필요할 때 업그레이드하세요.">Start free. Go deeper when you need to.</h2>
+  <p class="sec-sub" data-en="No subscription required to start. You pay only when we fail to protect you." data-ko="시작하는 데 구독이 필요 없습니다. 저희가 보호에 실패했을 때만 비용이 발생합니다.">No subscription required to start. You pay only when we fail to protect you.</p>
+
+  <div class="pricing-grid">
+    <div class="pc">
+      <span class="tier-badge tb-free" data-en="FREE" data-ko="무료">FREE</span>
+      <div class="pc-name" data-en="Starter" data-ko="스타터">Starter</div>
+      <div class="pc-price">$0 <span data-en="forever" data-ko="영구 무료">forever</span></div>
+      <div class="pc-desc" data-en="Instant scan. No account needed." data-ko="즉시 스캔. 계정 불필요.">Instant scan. No account needed.</div>
+      <div class="pc-features">
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Security score (0–100) + grade" data-ko="보안 점수 (0~100) + 등급">Security score + grade</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Top 3 vulnerability preview" data-ko="취약점 상위 3개 미리보기">Top 3 vulnerability preview</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="SSL, HTTP headers, email, DNS, ports" data-ko="SSL·HTTP헤더·이메일·DNS·포트">SSL, HTTP headers, email, DNS, ports</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="VirusTotal malware check" data-ko="VirusTotal 악성코드 확인">VirusTotal malware check</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Code file security scan (11 patterns)" data-ko="코드 파일 보안 스캔 (11가지 패턴)">Code file security scan</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Full PDF report via email" data-ko="이메일로 전체 PDF 리포트">Full PDF report via email</span></div>
+      </div>
+      <button class="pc-cta cta-out" onclick="document.getElementById('domain-input').focus()" data-en="Scan now — free" data-ko="지금 무료 스캔">Scan now — free</button>
+    </div>
+
+    <div class="pc featured">
+      <span class="tier-badge tb-plus">PLUS</span>
+      <div class="pc-name">Plus</div>
+      <div class="pc-price">$49 <span data-en="/ month" data-ko="/ 월">/ month</span></div>
+      <div class="pc-desc" data-en="Daily auto-scan + 60 expert-level checks." data-ko="매일 자동 스캔 + 전문가 60가지 검사.">Daily auto-scan + 60 expert-level checks.</div>
+      <div class="pc-features">
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Everything in Free" data-ko="Free 전체 포함">Everything in Free</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Weekly auto-scan with deep checks" data-ko="주 1회 심층 자동 스캔">Weekly auto-scan with deep checks</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="SQL injection, XSS, CSRF web scan" data-ko="SQL 인젝션·XSS·CSRF 웹 스캔">SQL injection, XSS, CSRF web scan</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Shodan CVE scan — known server vulnerabilities" data-ko="Shodan CVE 스캔 — 알려진 서버 취약점">Shodan CVE scan — known vulnerabilities</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="AI-generated code flaw detection" data-ko="AI 생성 코드 취약 패턴 탐지">AI-generated code flaw detection</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Cloud config audit (S3, GCP, Azure)" data-ko="클라우드 설정 감사 (S3, GCP, Azure)">Cloud config audit (S3, GCP, Azure)</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Slack / SMS / Kakao alerts" data-ko="Slack·SMS·카카오 알림">Slack / SMS / Kakao alerts</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Weekly detailed report" data-ko="주간 상세 리포트">Weekly detailed report</span></div>
+      </div>
+      <a href="/register" class="pc-cta cta-fill" data-en="Start Plus — Register Domain" data-ko="Plus 시작 — 도메인 등록">Start Plus — Register Domain</a>
+    </div>
+
+    <div class="pc">
+      <span class="tier-badge tb-max">MAX</span>
+      <div class="pc-name">Max</div>
+      <div class="pc-price">$149 <span data-en="/ month" data-ko="/ 월">/ month</span></div>
+      <div class="pc-desc" data-en="Full OWASP, dark web monitoring, supply chain." data-ko="OWASP 전체, 다크웹 모니터링, 공급망 감사.">Full OWASP, dark web monitoring, supply chain.</div>
+      <div class="pc-features">
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Everything in Plus" data-ko="Plus 전체 포함">Everything in Plus</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Full OWASP Top 10 auto-pentest" data-ko="OWASP Top 10 자동 침투 테스트">Full OWASP Top 10 auto-pentest</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Shodan deep CVE scan + historical data" data-ko="Shodan 심층 CVE 스캔 + 히스토리 데이터">Shodan deep CVE scan + history</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Dark web monitoring (credential leaks)" data-ko="다크웹 모니터링 (자격증명 유출)">Dark web monitoring</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Supply chain audit (npm, PyPI CVEs)" data-ko="공급망 감사 (npm·PyPI CVE)">Supply chain audit</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="AI/LLM prompt injection detection" data-ko="AI·LLM 프롬프트 인젝션 탐지">AI/LLM prompt injection detection</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Expert remote response within 72h" data-ko="72시간 내 전문가 원격 대응">Expert response within 72h</span></div>
+        <div class="pf"><span class="pf-check">✓</span><span data-en="Monthly executive report + review call" data-ko="월간 경영진 리포트 + 리뷰 미팅">Monthly executive report</span></div>
+      </div>
+      <a href="/register" class="pc-cta cta-purple" data-en="Start Max — Register Domain" data-ko="Max 시작 — 도메인 등록">Start Max — Register Domain</a>
+    </div>
+  </div>
+
+  <div class="perf-note">
+    <div class="perf-icon">⚡</div>
+    <div>
+      <div class="perf-title" data-en="Performance-based billing available on all plans" data-ko="성과 기반 과금 — 모든 요금제에서 선택 가능">Performance-based billing available on all plans</div>
+      <div class="perf-body" data-en="Zero upfront cost option: you pay only if a security incident occurs. Capped at $300/month. No breach = no charge." data-ko="선불 없는 옵션: 보안 침해가 발생했을 때만 최대 월 $300 과금. 침해 없으면 $0.">Zero upfront cost option: you pay only if a security incident occurs. Capped at $300/month. No breach = no charge.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">CyberShield</div>
+  <div class="footer-links">
+    <a href="/privacy" data-en="Privacy Policy" data-ko="개인정보처리방침">Privacy Policy</a>
+    <a href="/terms" data-en="Terms" data-ko="이용약관">Terms</a>
+    <a href="/contact" data-en="Contact" data-ko="문의">Contact</a>
+    <a href="/blog" data-en="Blog" data-ko="블로그">Blog</a>
+  </div>
+  <div class="footer-copy" data-en="© 2026 CyberShield. Protecting SMBs worldwide." data-ko="© 2026 CyberShield. 전 세계 중소기업의 보안을 지킵니다.">© 2026 CyberShield. Protecting SMBs worldwide.</div>
+</footer>
+
+<script>
+// ── API URL: edit the meta[name="api-url"] tag in <head> ──────────────────────
+const API = (document.querySelector('meta[name="api-url"]')?.content || '').replace(/\/+$/, '');
+
+let lang = localStorage.getItem('cs_lang') || 'en';
+let currentMode = 'url';
+let selectedFile = null;
+
+// Persists scan context so the email gate knows what type of scan was done
+let lastScan = { type: 'domain', label: '', score: 0, grade: '' };
+
+// ── i18n ──────────────────────────────────────────────────────────────────────
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('cs_lang', l);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.textContent === l.toUpperCase()));
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const txt = el.getAttribute('data-' + l);
+    if (!txt) return;
+    if (el.tagName === 'INPUT') el.placeholder = txt;
+    else el.innerHTML = txt;
+  });
+  document.documentElement.lang = l;
+}
+setLang(lang);
+
+// ── Mode toggle ───────────────────────────────────────────────────────────────
+function setMode(m) {
+  currentMode = m;
+  document.getElementById('mode-url').style.display  = m === 'url'  ? 'block' : 'none';
+  document.getElementById('mode-file').style.display = m === 'file' ? 'block' : 'none';
+  document.getElementById('tab-url').classList.toggle('on',  m === 'url');
+  document.getElementById('tab-file').classList.toggle('on', m === 'file');
+  resetScan();
+}
+
+// ── File handling ─────────────────────────────────────────────────────────────
+function handleFile(f) {
+  if (!f) return;
+  selectedFile = f;
+  const el = document.getElementById('file-selected');
+  el.textContent = f.name + '  (' + (f.size/1024).toFixed(1) + ' KB)';
+  el.style.display = 'block';
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('file-drop').classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) { document.getElementById('file-input').files = e.dataTransfer.files; handleFile(f); }
+}
+
+// ── Progress ──────────────────────────────────────────────────────────────────
+const URL_STEPS_EN  = ['Checking SSL certificate…','Scanning HTTP security headers…','Checking SPF / DKIM / DMARC…','Probing open ports…','Checking VirusTotal reputation…'];
+const URL_STEPS_KO  = ['SSL 인증서 확인 중…','HTTP 보안 헤더 스캔 중…','SPF / DKIM / DMARC 확인 중…','오픈 포트 탐지 중…','VirusTotal 평판 확인 중…'];
+const FILE_STEPS_EN = ['Reading source file…','Scanning for hardcoded secrets…','Checking auth & JWT patterns…','Detecting injection vulnerabilities…','Finalizing report…'];
+const FILE_STEPS_KO = ['소스 파일 읽는 중…','하드코딩된 시크릿 스캔 중…','인증·JWT 패턴 확인 중…','인젝션 취약점 탐지 중…','리포트 생성 중…'];
+
+function startProgress(stepsEn, stepsKo) {
+  document.getElementById('scan-progress').style.display = 'block';
+  document.getElementById('scan-results').style.display  = 'none';
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('step-' + i);
+    el.className = 'step';
+    el.querySelector('.step-icon').textContent = '—';
+    document.getElementById('step-' + i + '-txt').textContent = (lang === 'ko' ? stepsKo : stepsEn)[i-1];
+  }
+  document.getElementById('prog-bar').style.width = '0%';
+  let idx = 0;
+  return setInterval(() => {
+    if (idx < 5) {
+      if (idx > 0) {
+        const p = document.getElementById('step-' + idx);
+        p.className = 'step done'; p.querySelector('.step-icon').textContent = '✓';
+      }
+      const cur = document.getElementById('step-' + (idx+1));
+      cur.className = 'step active';
+      document.getElementById('prog-bar').style.width = ((idx+1)/5*100) + '%';
+      idx++;
+    }
+  }, 550);
+}
+
+function finishProgress() {
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('step-' + i);
+    el.className = 'step done'; el.querySelector('.step-icon').textContent = '✓';
+  }
+  document.getElementById('prog-bar').style.width = '100%';
+}
+
+function isApiReady() {
+  return API && API.length > 0 && !API.includes('YOUR-RAILWAY-APP');
+}
+
+function showApiError(errElId, msgKo, msgEn) {
+  const el = document.getElementById(errElId);
+  el.textContent = lang === 'ko' ? msgKo : msgEn;
+  el.style.display = 'block';
+}
+
+// ── Domain scan ───────────────────────────────────────────────────────────────
+async function startDomainScan() {
+  const raw   = document.getElementById('domain-input').value.trim();
+  const errEl = document.getElementById('url-error');
+  errEl.style.display = 'none';
+
+  const domain = raw.replace(/^https?:\/\//,'').split('/')[0].split('?')[0].toLowerCase();
+  if (!domain || !/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(domain)) {
+    showApiError('url-error', '유효한 도메인을 입력하세요 (예: example.com)', 'Enter a valid domain (e.g. example.com)');
+    return;
+  }
+
+  if (!isApiReady()) {
+    showApiError('url-error',
+      'index.html 상단 <meta name="api-url"> 태그에 Railway URL을 입력하세요.',
+      'Set your Railway URL in the <meta name="api-url"> tag at the top of index.html.');
+    return;
+  }
+
+  document.getElementById('scan-btn').disabled = true;
+  const timer = startProgress(URL_STEPS_EN, URL_STEPS_KO);
+
+  let res;
+  try {
+    res = await fetch(API + '/scan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain, lang }),
+    });
+  } catch (netErr) {
+    clearInterval(timer); finishProgress();
+    document.getElementById('scan-btn').disabled = false;
+    document.getElementById('scan-progress').style.display = 'none';
+    showApiError('url-error',
+      '백엔드에 연결할 수 없습니다. Railway 배포 상태 및 CORS 설정을 확인하세요. (브라우저 콘솔에서 상세 오류 확인)',
+      'Cannot reach backend. Check Railway deployment and CORS settings. (See browser console for details)');
+    console.error('[CyberShield] Domain scan network error:', netErr);
+    return;
+  }
+
+  clearInterval(timer); finishProgress();
+
+  if (res.status === 422) {
+    let msg = lang === 'ko' ? '존재하지 않는 도메인입니다. 철자를 확인하세요.' : 'Domain does not exist. Please check the spelling.';
+    try {
+      const d = await res.json();
+      if (d.detail) msg = lang === 'ko' ? (d.detail.message_ko || msg) : (d.detail.message_en || msg);
+    } catch {}
+    document.getElementById('scan-btn').disabled = false;
+    document.getElementById('scan-progress').style.display = 'none';
+    showApiError('url-error', msg, msg);
+    return;
+  }
+
+  if (!res.ok) {
+    let extra = '';
+    try { const d = await res.json(); extra = d.detail ? ' — ' + d.detail : ''; } catch {}
+    document.getElementById('scan-btn').disabled = false;
+    document.getElementById('scan-progress').style.display = 'none';
+    showApiError('url-error',
+      '서버 오류 (' + res.status + ')' + extra + '. Railway 로그를 확인하세요.',
+      'Server error (' + res.status + ')' + extra + '. Check Railway logs.');
+    return;
+  }
+
+  const data = await res.json();
+  lastScan = { type: 'domain', label: domain, score: data.score, grade: data.grade };
+
+  setTimeout(() => showResults({
+    label:    domain,
+    score:    data.score,
+    grade:    data.grade,
+    summary:  lang === 'ko' ? data.summary_ko : data.summary_en,
+    findings: data.preview_findings || [],
+    showGate: true,
+    isFile:   false,
+  }), 350);
+}
+
+// ── File scan ─────────────────────────────────────────────────────────────────
+async function startFileScan() {
+  const errEl = document.getElementById('file-error');
+  errEl.style.display = 'none';
+
+  if (!selectedFile) {
+    showApiError('file-error', '파일을 먼저 선택해주세요.', 'Please select a file first.');
+    return;
+  }
+
+  if (!isApiReady()) {
+    showApiError('file-error',
+      'index.html 상단 <meta name="api-url"> 태그에 Railway URL을 입력하세요.',
+      'Set your Railway URL in the <meta name="api-url"> tag.');
+    return;
+  }
+
+  document.getElementById('file-scan-btn').disabled = true;
+  const timer = startProgress(FILE_STEPS_EN, FILE_STEPS_KO);
+
+  let res;
+  try {
+    const fd = new FormData();
+    fd.append('file', selectedFile);
+    fd.append('lang', lang);
+    res = await fetch(API + '/scan/file', { method: 'POST', body: fd });
+  } catch (netErr) {
+    clearInterval(timer); finishProgress();
+    document.getElementById('file-scan-btn').disabled = false;
+    document.getElementById('scan-progress').style.display = 'none';
+    showApiError('file-error',
+      '백엔드에 연결할 수 없습니다. Railway 배포 상태 및 CORS 설정을 확인하세요.',
+      'Cannot reach backend. Check Railway deployment and CORS settings.');
+    console.error('[CyberShield] File scan network error:', netErr);
+    return;
+  }
+
+  clearInterval(timer); finishProgress();
+
+  if (!res.ok) {
+    let extra = '';
+    try { const d = await res.json(); extra = d.detail ? ' — ' + d.detail : ''; } catch {}
+    document.getElementById('file-scan-btn').disabled = false;
+    document.getElementById('scan-progress').style.display = 'none';
+    showApiError('file-error',
+      '서버 오류 (' + res.status + ')' + extra,
+      'Server error (' + res.status + ')' + extra);
+    return;
+  }
+
+  const data = await res.json();
+  lastScan = { type: 'file', label: data.filename, score: data.score, grade: data.grade };
+
+  setTimeout(() => showResults({
+    label:    data.filename,
+    score:    data.score,
+    grade:    data.grade,
+    summary:  lang === 'ko' ? data.summary_ko : data.summary_en,
+    findings: data.findings || [],
+    showGate: true,
+    isFile:   true,
+  }), 350);
+}
+
+// ── Show results ──────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function showResults({ label, score, grade, summary, findings, showGate, isFile }) {
+  document.getElementById('scan-progress').style.display = 'none';
+  document.getElementById('scan-results').style.display  = 'block';
+  document.getElementById('scan-btn').disabled      = false;
+  document.getElementById('file-scan-btn').disabled = false;
+
+  const gc = score >= 80 ? 'var(--accent)' : score >= 55 ? 'var(--warn)' : 'var(--danger)';
+  document.getElementById('score-circle').style.borderColor = gc;
+  document.getElementById('score-num').textContent   = score;
+  document.getElementById('score-num').style.color   = gc;
+  document.getElementById('result-grade').textContent = grade;
+  document.getElementById('result-grade').style.color = gc;
+  document.getElementById('result-label').textContent   = label;
+  document.getElementById('result-summary').textContent = summary;
+
+  const SEV = { critical:'sev-critical', high:'sev-high', medium:'sev-medium', low:'sev-low' };
+  document.getElementById('findings-list').innerHTML = findings.map(f => {
+    const t   = lang === 'ko' ? f.title_ko       : f.title;
+    const d   = lang === 'ko' ? f.description_ko : f.description;
+    const fix = lang === 'ko' ? f.remediation_ko : f.remediation;
+    const lineHtml = f.line ? '<div class="f-line">Line ' + f.line + '</div>' : '';
+    return '<div class="finding">'
+      + '<span class="sev ' + (SEV[f.severity] || 'sev-low') + '">' + f.severity.toUpperCase() + '</span>'
+      + '<div class="f-body">'
+      + '<div class="f-title">' + escHtml(t) + '</div>'
+      + '<div class="f-desc">'  + escHtml(d) + '</div>'
+      + '<div class="f-fix">&#8594; ' + escHtml(fix) + '</div>'
+      + lineHtml
+      + '</div></div>';
+  }).join('');
+
+  // Customise gate copy for file scans
+  if (isFile) {
+    const h3 = document.querySelector('#gate-box h3');
+    const p  = document.querySelector('#gate-box p');
+    if (h3) h3.textContent = lang === 'ko' ? '코드 분석 리포트 이메일로 받기' : 'Get your code analysis report by email';
+    if (p)  p.textContent  = lang === 'ko'
+      ? '이메일을 입력하면 전체 취약점 목록과 수정 가이드 PDF를 무료로 받을 수 있습니다.'
+      : 'Enter your email to receive the full vulnerability list + fix guide (free PDF).';
+  } else {
+    const h3 = document.querySelector('#gate-box h3');
+    const p  = document.querySelector('#gate-box p');
+    if (h3) h3.textContent = lang === 'ko' ? '전체 리포트 받기' : 'Get your full report';
+    if (p)  p.textContent  = lang === 'ko'
+      ? '이메일을 입력하면 전체 취약점 목록 + 수정 가이드 PDF를 무료로 받을 수 있습니다.'
+      : 'Enter your email to receive the complete vulnerability list + fix guide (free PDF).';
+  }
+
+  const gate = document.getElementById('gate-box');
+  gate.style.display      = showGate ? 'block' : 'none';
+  gate.style.opacity      = '1';
+  gate.style.pointerEvents = 'auto';
+  document.getElementById('email-input').value = '';
+  document.getElementById('email-msg').textContent = '';
+}
+
+// ── Email report ──────────────────────────────────────────────────────────────
+async function submitEmail() {
+  const emailVal = document.getElementById('email-input').value.trim();
+  const msgEl    = document.getElementById('email-msg');
+
+  if (!emailVal || !/^[^@]+@[^@]+\.[^@]+$/.test(emailVal)) {
+    msgEl.className = 'err';
+    msgEl.textContent = lang === 'ko' ? '유효한 이메일을 입력해주세요.' : 'Enter a valid email address.';
+    return;
+  }
+
+  msgEl.className = 'ok';
+  msgEl.textContent = lang === 'ko' ? '발송 중…' : 'Sending…';
+
+  try {
+    let res, data;
+
+    if (lastScan.type === 'file') {
+      // Re-submit the file with email appended
+      if (!selectedFile) {
+        msgEl.className = 'err';
+        msgEl.textContent = lang === 'ko'
+          ? '파일 리포트 발송을 위해 파일을 다시 업로드해주세요.'
+          : 'Please re-select the file to send the report.';
+        return;
+      }
+      const fd = new FormData();
+      fd.append('file', selectedFile);
+      fd.append('lang', lang);
+      fd.append('email', emailVal);
+      res  = await fetch(API + '/scan/file', { method: 'POST', body: fd });
+      data = res.ok ? await res.json() : null;
+    } else {
+      res = await fetch(API + '/scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ domain: lastScan.label, email: emailVal, lang }),
+      });
+      data = res.ok ? await res.json() : null;
+    }
+
+    if (data && data.email_sent) {
+      msgEl.textContent = lang === 'ko'
+        ? '✓ ' + emailVal + ' 으로 리포트를 발송했습니다.'
+        : '✓ Full report sent to ' + emailVal;
+    } else {
+      msgEl.textContent = lang === 'ko'
+        ? '✓ 요청이 접수됐습니다. 잠시 후 메일을 확인해주세요.'
+        : '✓ Request received. Please check your inbox shortly.';
+    }
+
+    document.getElementById('gate-box').style.opacity      = '0.5';
+    document.getElementById('gate-box').style.pointerEvents = 'none';
+
+  } catch (err) {
+    msgEl.className = 'err';
+    msgEl.textContent = lang === 'ko' ? '발송 실패. 잠시 후 다시 시도해주세요.' : 'Send failed. Please try again.';
+  }
+}
+
+// ── Reset ─────────────────────────────────────────────────────────────────────
+function resetScan() {
+  document.getElementById('scan-results').style.display  = 'none';
+  document.getElementById('scan-progress').style.display = 'none';
+  document.getElementById('scan-btn').disabled      = false;
+  document.getElementById('file-scan-btn').disabled = false;
+  document.getElementById('domain-input').value     = '';
+  document.getElementById('url-error').style.display  = 'none';
+  document.getElementById('file-error').style.display = 'none';
+  selectedFile = null;
+  document.getElementById('file-selected').style.display = 'none';
+  document.getElementById('file-input').value = '';
+  document.getElementById('email-msg').textContent = '';
+  const gate = document.getElementById('gate-box');
+  gate.style.opacity = '1'; gate.style.pointerEvents = 'auto';
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById('step-' + i);
+    el.className = 'step'; el.querySelector('.step-icon').textContent = '—';
+  }
+  document.getElementById('prog-bar').style.width = '0%';
+  lastScan = { type: 'domain', label: '', score: 0, grade: '' };
+}
+
+document.getElementById('domain-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startDomainScan();
+});
+</script>
+
+</body>
+</html>

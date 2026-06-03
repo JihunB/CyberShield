@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="15 Dangerous Open Ports on Your Server — Close These Now | CyberShield" data-ko="서버에 열려있는 위험한 포트 15가지 — 지금 당장 닫아야 하는 것들 | CyberShield">서버에 열려있는 위험한 포트 15가지 — 지금 당장 닫아야 하는 것들 | CyberShield</title>
+<meta name="description" content="FTP, Telnet, RDP, Redis, MongoDB... 열려있으면 해커가 5분 안에 찾아냅니다. 위험한 포트 15개와 즉시 닫는 방법을 설명합니다.">
+<meta property="og:title" content="서버에 열려있는 위험한 포트 15가지 — 지금 당장 닫아야 하는 것들">
+<meta property="og:image" content="https://cyber-shield-ruby.vercel.app/og-image.png">
+<link rel="canonical" href="https://cyber-shield-ruby.vercel.app/blog/open-ports-guide">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.nav-back{font-size:12px;color:var(--text2);text-decoration:none}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;margin-bottom:1rem}
+.tag-ssl{background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2)}
+.tag-email{background:rgba(77,159,255,.1);color:#4d9fff;border:1px solid rgba(77,159,255,.2)}
+.tag-code{background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2)}
+.tag-agent{background:rgba(255,181,71,.1);color:var(--warn);border:1px solid rgba(255,181,71,.2)}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem 1.75rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" class="nav-back" data-en="← Blog" data-ko="← 블로그">← 블로그</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+<div class="container">
+  <span class="post-tag tag-ssl" data-en="Port Security" data-ko="포트 보안">포트 보안</span>
+  
+  <h1 data-en="15 Dangerous Open Ports — Close These Now" data-ko="서버에 열려있는 위험한 포트 15가지 — 지금 당장 닫아야 하는 것들">서버에 열려있는 위험한 포트 15가지</h1>
+  <div class="meta">2026.04.10 · 6 min read · CyberShield</div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  <p data-en="Shodan, a search engine for internet-connected devices, indexes millions of vulnerable servers every day. If your server has unnecessary ports open, it's publicly searchable within minutes of going online."
+     data-ko="인터넷에 연결된 기기를 검색할 수 있는 Shodan에는 매일 수백만 개의 취약한 서버가 인덱싱됩니다. 불필요한 포트가 열려 있으면 서버가 온라인 상태가 된 지 몇 분 안에 검색 가능한 상태가 됩니다.">인터넷에 연결된 기기를 검색할 수 있는 Shodan에는 매일 수백만 개의 취약한 서버가 인덱싱됩니다.</p>
+
+  <h2 data-en="The Most Dangerous Ports" data-ko="가장 위험한 포트들">가장 위험한 포트들</h2>
+
+  <h3 data-en="🔴 Critical — Close Immediately" data-ko="🔴 치명적 — 즉시 닫아야">🔴 치명적 — 즉시 닫아야</h3>
+  <ul>
+    <li data-en="<strong>Port 23 (Telnet)</strong> — Sends all data including passwords in plaintext. No legitimate use case. Close immediately." data-ko="<strong>포트 23 (Telnet)</strong> — 비밀번호를 포함한 모든 데이터가 평문으로 전송됩니다. 즉시 차단하세요."><strong>포트 23 (Telnet)</strong> — 모든 데이터가 평문으로 전송됩니다. 즉시 차단하세요.</li>
+    <li data-en="<strong>Port 6379 (Redis)</strong> — No authentication by default. Anyone who reaches this port gets full read/write access." data-ko="<strong>포트 6379 (Redis)</strong> — 기본적으로 인증이 없습니다. 연결된 누구든 전체 읽기/쓰기 권한을 갖습니다."><strong>포트 6379 (Redis)</strong> — 기본 인증 없음. 연결한 누구에게나 전체 읽기/쓰기 권한이 주어집니다.</li>
+    <li data-en="<strong>Port 27017 (MongoDB)</strong> — Like Redis, no auth by default. Massive ransomware target." data-ko="<strong>포트 27017 (MongoDB)</strong> — Redis와 마찬가지로 기본 인증 없음. 랜섬웨어의 주요 타깃입니다."><strong>포트 27017 (MongoDB)</strong> — 기본 인증 없음. 랜섬웨어 주요 타깃입니다.</li>
+    <li data-en="<strong>Port 9200 (Elasticsearch)</strong> — Default setup has no authentication. All your indexed data is exposed." data-ko="<strong>포트 9200 (Elasticsearch)</strong> — 기본 설정에 인증 없음. 인덱싱된 모든 데이터가 노출됩니다."><strong>포트 9200 (Elasticsearch)</strong> — 기본 설정에 인증 없음. 모든 데이터 노출됩니다.</li>
+    <li data-en="<strong>Port 4444 (Metasploit reverse shell)</strong> — If this port is open on your server, you may already be compromised." data-ko="<strong>포트 4444 (Metasploit 리버스 쉘)</strong> — 이 포트가 열려있으면 이미 침해가 발생했을 수 있습니다."><strong>포트 4444</strong> — 리버스 쉘 포트. 열려있으면 이미 침해 가능성이 있습니다.</li>
+  </ul>
+
+  <h3 data-en="🟠 High Risk — Restrict Access" data-ko="🟠 높은 위험 — 접근 제한 필요">🟠 높은 위험 — 접근 제한 필요</h3>
+  <ul>
+    <li data-en="<strong>Port 3306 (MySQL)</strong> — Should only be accessible from localhost or specific IPs, never 0.0.0.0." data-ko="<strong>포트 3306 (MySQL)</strong> — localhost 또는 특정 IP에서만 접근 가능해야 합니다. 0.0.0.0은 절대 안 됩니다."><strong>포트 3306 (MySQL)</strong> — localhost 또는 특정 IP만 허용하세요.</li>
+    <li data-en="<strong>Port 3389 (RDP)</strong> — Primary target for ransomware attacks. Restrict to VPN access only." data-ko="<strong>포트 3389 (RDP)</strong> — 랜섬웨어 공격의 주요 타깃입니다. VPN 접속으로만 제한하세요."><strong>포트 3389 (RDP)</strong> — 랜섬웨어 주요 타깃. VPN 전용으로 제한하세요.</li>
+    <li data-en="<strong>Port 5432 (PostgreSQL)</strong> — Like MySQL, should never be open to the internet." data-ko="<strong>포트 5432 (PostgreSQL)</strong> — MySQL과 마찬가지로 인터넷에 노출되어서는 안 됩니다."><strong>포트 5432 (PostgreSQL)</strong> — 인터넷 노출 금지.</li>
+    <li data-en="<strong>Port 5900 (VNC)</strong> — Remote desktop with historically weak authentication. Use SSH tunneling instead." data-ko="<strong>포트 5900 (VNC)</strong> — 인증이 취약한 원격 데스크톱. SSH 터널링으로 대체하세요."><strong>포트 5900 (VNC)</strong> — SSH 터널링으로 대체하세요.</li>
+    <li data-en="<strong>Port 21 (FTP)</strong> — Unencrypted file transfer. Use SFTP (port 22) instead." data-ko="<strong>포트 21 (FTP)</strong> — 암호화되지 않은 파일 전송. SFTP(포트 22)로 대체하세요."><strong>포트 21 (FTP)</strong> — SFTP로 대체하세요.</li>
+  </ul>
+
+  <h2 data-en="How to Check and Close Ports" data-ko="포트 확인 및 닫는 방법">포트 확인 및 닫는 방법</h2>
+  <pre><code data-en="# Check listening ports
+ss -tlnp               # Linux
+netstat -an | grep LISTEN  # macOS
+
+# Close a port in UFW (Ubuntu)
+sudo ufw deny 6379
+sudo ufw deny 27017
+sudo ufw reload
+
+# Verify
+sudo ufw status" data-ko="# 열린 포트 확인
+ss -tlnp               # Linux
+netstat -an | grep LISTEN  # macOS
+
+# UFW로 포트 차단 (Ubuntu)
+sudo ufw deny 6379
+sudo ufw deny 27017
+sudo ufw reload
+
+# 확인
+sudo ufw status"># 열린 포트 확인
+ss -tlnp
+sudo ufw deny 6379 && sudo ufw reload</code></pre>
+
+  <div class="callout tip" data-en="<strong>✓ Best practice:</strong> Always apply the principle of least privilege to ports. Only ports 80, 443, and your SSH port (ideally non-22) should be open to the internet."
+       data-ko="<strong>✓ 원칙:</strong> 항상 최소 권한 원칙을 적용하세요. 인터넷에 열려있어야 하는 포트는 80, 443, 그리고 SSH 포트(가능하면 22가 아닌 다른 포트)뿐입니다."><strong>✓ 원칙:</strong> 인터넷에 노출되어야 하는 포트는 80, 443, SSH 3개가 전부입니다.</div>
+
+  <div class="scan-cta">
+    <div>
+      <strong style="font-size:1rem" data-en="Check open ports on your server right now" data-ko="지금 내 서버 오픈 포트 확인하기">지금 내 서버 오픈 포트 확인하기</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="30-second scan — 15 dangerous ports checked instantly" data-ko="30초 스캔 — 15개 위험 포트 즉시 확인">30초 스캔 — 15개 위험 포트 즉시 확인</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔍 Free Scan" data-ko="🔍 무료 스캔">🔍 무료 스캔</a>
+  </div>
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고">광고</div>
+  <p style="font-size:13px;color:var(--text3);border-top:1px solid var(--border);padding-top:1.25rem;margin-top:2rem">
+    <span data-en="Related:" data-ko="관련 글:">관련 글:</span>
+    <a href="/blog/ssl-guide" data-en="SSL Certificate Auto-Renewal Guide" data-ko="SSL 인증서 자동 갱신 가이드">SSL 인증서 자동 갱신 가이드</a> ·
+    <a href="/blog/dmarc-guide" data-en="Email Spoofing Prevention" data-ko="이메일 스푸핑 방지 가이드">이메일 스푸핑 방지 가이드</a>
+  </p>
+
+</div>
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/">Home</a> · <a href="/privacy" data-en="Privacy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+    // Update page title
+    const titleEl = document.querySelector('title[data-en]') || document.querySelector('title');
+    if (titleEl && titleEl.getAttribute('data-' + lang)) titleEl.textContent = titleEl.getAttribute('data-' + lang);
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

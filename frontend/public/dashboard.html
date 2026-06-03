@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberShield 대시보드</title>
+<meta name="robots" content="noindex"><!-- 고객 전용 페이지 -->
+
+<!-- Supabase JS (Auth) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<!-- Fonts: IBM Plex Mono + IBM Plex Sans -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ── meta: Supabase 설정 (vercel.json에서 환경변수로 주입하거나 직접 입력) ── -->
+<meta name="supabase-url"  content="https://fuhbdbbnqkffqpxzopxm.supabase.co">
+<meta name="supabase-anon" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ1aGJkYmJucWtmZnFweHpvcHhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjcxOTIsImV4cCI6MjA5MTM0MzE5Mn0.Ip0eetKZELrGtnAz1vMiCcdtyQahyQ_VA8XdpCJQQf8">
+<meta name="api-url"       content="https://cybershield-10-production.up.railway.app">
+
+<style>
+/* ── Reset & Variables ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Core palette */
+  --bg:     #050810;
+  --bg1:    #080d14;
+  --bg2:    #0c1220;
+  --bg3:    #111a2e;
+  --bg4:    #162035;
+
+  /* Borders */
+  --bdr:    rgba(100,160,255,0.08);
+  --bdr2:   rgba(100,160,255,0.14);
+  --bdr3:   rgba(100,160,255,0.22);
+
+  /* Text */
+  --text:   #d4e4ff;
+  --text2:  #7a98c4;
+  --text3:  #3a5070;
+  --text4:  #1e3050;
+
+  /* Accent */
+  --green:  #00e5a0;
+  --green2: #00c880;
+  --blue:   #4d9fff;
+  --purple: #a78bfa;
+  --red:    #ff4d6a;
+  --orange: #ffb547;
+
+  /* Severity */
+  --crit:  #ff4d6a;
+  --high:  #ffb547;
+  --med:   #4d9fff;
+  --low:   #a78bfa;
+
+  /* Typography */
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+
+  /* Sizing */
+  --nav-h: 52px;
+  --sidebar-w: 220px;
+  --r: 8px;
+  --r2: 12px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Scanline texture ──────────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(77,159,255,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(77,159,255,.018) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────── */
+@keyframes fadeIn   { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+@keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.35} }
+@keyframes spin     { to{transform:rotate(360deg)} }
+@keyframes scanline { 0%{top:-100%} 100%{top:100%} }
+@keyframes blink    { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+/* ── ═══════════════════════════════════════════
+        LOGIN SCREEN
+   ═══════════════════════════════════════════ */
+#login-screen {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+  animation: fadeIn .4s ease;
+}
+
+.login-card {
+  width: 100%; max-width: 420px;
+  background: var(--bg2);
+  border: 1px solid var(--bdr2);
+  border-radius: var(--r2);
+  padding: 2.5rem 2rem;
+  position: relative; overflow: hidden;
+}
+
+.login-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+
+.login-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 16px; color: var(--green);
+  margin-bottom: 2rem;
+}
+
+.login-logo-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.login-title {
+  font-size: 1.4rem; font-weight: 600;
+  color: var(--text); margin-bottom: .375rem;
+}
+
+.login-sub {
+  font-size: 13px; color: var(--text2); margin-bottom: 1.75rem;
+}
+
+.field { margin-bottom: 1.125rem; }
+
+.field label {
+  display: block;
+  font-family: var(--mono); font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; color: var(--text3);
+  margin-bottom: .4rem; text-transform: uppercase;
+}
+
+.field input {
+  width: 100%; height: 44px;
+  background: var(--bg3); border: 1px solid var(--bdr2);
+  border-radius: var(--r); padding: 0 .875rem;
+  color: var(--text); font-family: var(--sans); font-size: 14px;
+  outline: none; transition: border-color .2s;
+}
+.field input:focus { border-color: var(--green); }
+.field input::placeholder { color: var(--text3); }
+
+.btn-primary {
+  width: 100%; height: 46px;
+  background: var(--green); color: var(--bg);
+  border: none; border-radius: var(--r);
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; cursor: pointer;
+  transition: background .2s, transform .1s;
+  margin-top: .5rem;
+}
+.btn-primary:hover { background: #00ffb3; }
+.btn-primary:active { transform: scale(.99); }
+.btn-primary:disabled { background: #005a40; color: #003020; cursor: not-allowed; }
+
+.divider {
+  display: flex; align-items: center; gap: .875rem;
+  color: var(--text3); font-size: 12px; margin: 1.25rem 0;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--bdr2);
+}
+
+.btn-google {
+  width: 100%; height: 46px;
+  background: var(--bg3); border: 1px solid var(--bdr2);
+  border-radius: var(--r); color: var(--text);
+  font-family: var(--sans); font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: border-color .2s, background .2s;
+}
+.btn-google:hover { border-color: var(--bdr3); background: var(--bg4); }
+
+.login-toggle {
+  text-align: center; margin-top: 1.25rem;
+  font-size: 13px; color: var(--text2);
+}
+.login-toggle a {
+  color: var(--green); text-decoration: none; cursor: pointer;
+}
+.login-toggle a:hover { text-decoration: underline; }
+
+.login-error {
+  background: rgba(255,77,106,.12); border: 1px solid rgba(255,77,106,.3);
+  border-radius: var(--r); padding: .625rem .875rem;
+  font-size: 12px; color: var(--red);
+  margin-bottom: 1rem; display: none;
+}
+
+/* ── ═══════════════════════════════════════════
+        APP SHELL
+   ═══════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; }
+
+/* ── Top Nav ─────────────────────────────────────────────────────────────── */
+.topnav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: var(--nav-h);
+  background: rgba(5,8,16,.92); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--bdr);
+  display: flex; align-items: center; padding: 0 1.5rem;
+  gap: 1rem;
+}
+
+.nav-logo {
+  font-family: var(--mono); font-size: 13px; color: var(--green);
+  display: flex; align-items: center; gap: 8px; text-decoration: none;
+  flex-shrink: 0;
+}
+
+.nav-logo-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); animation: pulse 2s ease-in-out infinite;
+}
+
+.nav-domain {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text3); background: var(--bg3);
+  border: 1px solid var(--bdr); border-radius: 4px;
+  padding: 3px 10px;
+}
+
+.nav-right {
+  margin-left: auto; display: flex; align-items: center; gap: .75rem;
+}
+
+.agent-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+  padding: 4px 10px; border-radius: 4px;
+}
+.agent-badge.online  { background: rgba(0,229,160,.1);  color: var(--green);  border: 1px solid rgba(0,229,160,.2); }
+.agent-badge.offline { background: rgba(255,77,106,.1); color: var(--red);    border: 1px solid rgba(255,77,106,.2); }
+/* agent-badge-dot removed — Direction 2 uses quota badge */
+
+.nav-rescan-btn {
+  height: 30px; padding: 0 12px;
+  background: transparent; border: 1px solid var(--bdr2);
+  border-radius: var(--r); color: var(--text2);
+  font-family: var(--mono); font-size: 10px; letter-spacing: .06em;
+  cursor: pointer; transition: all .2s;
+}
+.nav-rescan-btn:hover { border-color: var(--green); color: var(--green); }
+
+.lang-toggle { display: flex; gap: 2px; background: var(--bg3); border: 1px solid var(--bdr2); border-radius: 5px; overflow: hidden; }
+.lang-btn    { padding: 4px 9px; font-size: 10px; font-family: var(--mono); background: transparent; border: none; color: var(--text3); cursor: pointer; transition: all .2s; }
+.lang-btn.on { background: var(--green); color: var(--bg); font-weight: 700; }
+
+.nav-user-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--bdr2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; color: var(--text2);
+  cursor: pointer; transition: border-color .2s; position: relative;
+}
+.nav-user-btn:hover { border-color: var(--bdr3); }
+
+.user-menu {
+  position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--bg3); border: 1px solid var(--bdr2);
+  border-radius: var(--r); padding: .375rem 0; min-width: 160px;
+  display: none; z-index: 200;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+}
+.user-menu.open { display: block; animation: fadeIn .15s ease; }
+.user-menu-item {
+  padding: .5rem 1rem; font-size: 13px; color: var(--text2);
+  cursor: pointer; transition: color .15s, background .15s;
+}
+.user-menu-item:hover { color: var(--text); background: rgba(255,255,255,.04); }
+.user-menu-item.danger:hover { color: var(--red); }
+.user-menu-sep { height: 1px; background: var(--bdr); margin: .25rem 0; }
+
+/* ── Main Layout ───────────────────────────────────────────────────────────── */
+.main-content {
+  padding-top: var(--nav-h);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-bottom: 4rem;
+}
+
+/* ── Loading skeleton ─────────────────────────────────────────────────────── */
+#loading-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; min-height: calc(100vh - var(--nav-h));
+  gap: 1rem;
+}
+.loading-spinner {
+  width: 36px; height: 36px;
+  border: 2px solid var(--bg3);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+.loading-text {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text3); letter-spacing: .1em;
+}
+
+/* ── Dashboard content ────────────────────────────────────────────────────── */
+#dashboard-content { display: none; animation: fadeIn .4s ease; }
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+.page-header {
+  padding: 1.75rem 0 1.25rem;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+  border-bottom: 1px solid var(--bdr);
+  margin-bottom: 1.5rem;
+}
+
+.page-title { font-size: 1.25rem; font-weight: 600; color: var(--text); }
+.page-sub   { font-size: 12px; color: var(--text2); margin-top: 2px; font-family: var(--mono); }
+.page-time  { font-family: var(--mono); font-size: 10px; color: var(--text3); letter-spacing: .06em; }
+
+/* ── Grid system ──────────────────────────────────────────────────────────── */
+.grid-top    { display: grid; grid-template-columns: 280px 1fr 1fr; gap: 1.125rem; margin-bottom: 1.125rem; }
+.grid-mid    { display: grid; grid-template-columns: 1fr 1fr; gap: 1.125rem; margin-bottom: 1.125rem; }
+.grid-bottom { display: grid; grid-template-columns: 1fr; gap: 1.125rem; }
+
+@media (max-width: 1100px) { .grid-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 780px)  { .grid-top, .grid-mid { grid-template-columns: 1fr; } }
+
+/* ── Widget card ──────────────────────────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: var(--r2);
+  padding: 1.25rem 1.375rem;
+  position: relative; overflow: hidden;
+  transition: border-color .2s;
+}
+.card:hover { border-color: var(--bdr2); }
+.card::before {
+  content: ''; position: absolute; top: 0; left: 1.375rem; right: 1.375rem; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bdr2), transparent);
+}
+
+.card-label {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; color: var(--text3); text-transform: uppercase;
+  margin-bottom: .875rem;
+}
+
+/* ── Score Widget ─────────────────────────────────────────────────────────── */
+.score-widget { display: flex; flex-direction: column; }
+
+.score-hex-wrap {
+  display: flex; align-items: center; gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+/* Hexagonal score badge */
+.score-hex {
+  position: relative; flex-shrink: 0;
+  width: 90px; height: 103px;
+}
+.score-hex svg { width: 100%; height: 100%; }
+.score-hex-inner {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 1px;
+}
+.score-num {
+  font-family: var(--mono); font-weight: 700;
+  font-size: 2.25rem; line-height: 1;
+  transition: color .5s;
+}
+.score-denom {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text3); letter-spacing: .06em;
+}
+
+.score-meta { flex: 1; min-width: 0; }
+.score-grade {
+  font-family: var(--mono); font-weight: 700; font-size: 2rem;
+  line-height: 1; margin-bottom: .375rem;
+}
+.score-grade-label {
+  font-size: 12px; color: var(--text2); margin-bottom: .625rem;
+}
+.score-delta {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  padding: 3px 8px; border-radius: 4px;
+}
+.score-delta.up   { background: rgba(0,229,160,.1);  color: var(--green);  }
+.score-delta.same { background: var(--bg3);           color: var(--text3);  }
+.score-delta.down { background: rgba(255,77,106,.1); color: var(--red);    }
+
+.score-bar-wrap {
+  margin-top: auto;
+  background: var(--bg3); border-radius: 3px; height: 4px; overflow: hidden;
+}
+.score-bar {
+  height: 100%; border-radius: 3px;
+  transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Action Cards ─────────────────────────────────────────────────────────── */
+.action-list { display: flex; flex-direction: column; gap: .625rem; }
+
+.action-item {
+  display: flex; align-items: flex-start; gap: .875rem;
+  background: var(--bg3); border: 1px solid var(--bdr);
+  border-radius: var(--r); padding: .875rem;
+  transition: border-color .2s;
+}
+.action-item:hover { border-color: var(--bdr2); }
+
+.action-sev-bar {
+  width: 3px; border-radius: 2px; align-self: stretch; flex-shrink: 0;
+  min-height: 40px;
+}
+
+.action-body { flex: 1; min-width: 0; }
+.action-tag  {
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 3px; display: inline-block; margin-bottom: .375rem;
+}
+.action-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: .25rem; line-height: 1.4; }
+.action-desc  { font-size: 11px; color: var(--text2); line-height: 1.5; }
+
+.action-btn {
+  flex-shrink: 0; height: 28px; padding: 0 10px;
+  background: transparent; border: 1px solid var(--bdr2);
+  border-radius: 5px; color: var(--text2);
+  font-family: var(--mono); font-size: 9px; letter-spacing: .06em;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
+}
+.action-btn:hover { border-color: var(--green); color: var(--green); }
+
+.empty-state {
+  text-align: center; padding: 2rem 1rem;
+  color: var(--text3); font-size: 13px;
+}
+.empty-state-icon { font-size: 2rem; margin-bottom: .5rem; opacity: .5; }
+
+/* Severity color helpers */
+.sev-crit { color: var(--crit); }
+.sev-high { color: var(--high); }
+.sev-med  { color: var(--med);  }
+.sev-low  { color: var(--low);  }
+
+.bg-crit { background: var(--crit); }
+.bg-high { background: var(--high); }
+.bg-med  { background: var(--med);  }
+.bg-low  { background: var(--low);  }
+
+.bgfade-crit { background: rgba(255,77,106,.1);  border-color: rgba(255,77,106,.25);  }
+.bgfade-high { background: rgba(255,181,71,.1);  border-color: rgba(255,181,71,.25);  }
+.bgfade-med  { background: rgba(77,159,255,.1);  border-color: rgba(77,159,255,.25);  }
+.bgfade-low  { background: rgba(167,139,250,.1); border-color: rgba(167,139,250,.25); }
+
+/* ── Event Feed ───────────────────────────────────────────────────────────── */
+.event-feed { display: flex; flex-direction: column; gap: 0; }
+
+.event-item {
+  display: flex; gap: .875rem; padding: .875rem 0;
+  border-bottom: 1px solid var(--bdr);
+  animation: fadeIn .3s ease both;
+}
+.event-item:last-child { border-bottom: none; }
+
+.event-icon-wrap {
+  flex-shrink: 0; width: 32px; height: 32px;
+  border-radius: 50%; background: var(--bg3); border: 1px solid var(--bdr);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; position: relative;
+}
+
+.event-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 8px; height: 8px; border-radius: 50%;
+  border: 1.5px solid var(--bg2);
+}
+
+.event-body { flex: 1; min-width: 0; }
+.event-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.event-desc  { font-size: 11px; color: var(--text2); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.event-ip    { font-family: var(--mono); font-size: 10px; color: var(--text3); }
+
+.event-time {
+  flex-shrink: 0; font-family: var(--mono);
+  font-size: 10px; color: var(--text3); white-space: nowrap;
+  padding-top: 2px;
+}
+
+/* ── Blocked Stats ────────────────────────────────────────────────────────── */
+.blocked-total {
+  display: flex; align-items: baseline; gap: .5rem; margin-bottom: 1.25rem;
+}
+.blocked-num {
+  font-family: var(--mono); font-weight: 700;
+  font-size: 2.75rem; color: var(--green); line-height: 1;
+}
+.blocked-label { font-size: 12px; color: var(--text2); }
+
+.country-bar-list { display: flex; flex-direction: column; gap: .625rem; }
+
+.country-item { display: flex; align-items: center; gap: .625rem; }
+.country-flag { font-size: 14px; flex-shrink: 0; }
+.country-name { font-size: 12px; color: var(--text); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.country-bar-wrap { width: 80px; flex-shrink: 0; background: var(--bg3); border-radius: 3px; height: 4px; overflow: hidden; }
+.country-bar { height: 100%; background: var(--green); border-radius: 3px; transition: width .8s ease; }
+.country-count { font-family: var(--mono); font-size: 11px; color: var(--text3); flex-shrink: 0; width: 28px; text-align: right; }
+
+/* ── Vulnerability List ───────────────────────────────────────────────────── */
+.vuln-filters {
+  display: flex; gap: .375rem; margin-bottom: 1rem; flex-wrap: wrap;
+}
+.vuln-filter-btn {
+  height: 26px; padding: 0 10px;
+  background: transparent; border: 1px solid var(--bdr);
+  border-radius: 5px; color: var(--text3);
+  font-family: var(--mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .08em; cursor: pointer; transition: all .2s;
+}
+.vuln-filter-btn.active { border-color: var(--green); color: var(--green); background: rgba(0,229,160,.08); }
+
+.vuln-list { display: flex; flex-direction: column; gap: .5rem; }
+
+.vuln-item {
+  display: grid;
+  grid-template-columns: 3px 28px 1fr auto auto;
+  align-items: start; gap: .875rem;
+  background: var(--bg3); border: 1px solid var(--bdr);
+  border-radius: var(--r); padding: .875rem;
+  transition: border-color .2s, opacity .2s;
+}
+.vuln-item:hover { border-color: var(--bdr2); }
+.vuln-item.resolved { opacity: .4; }
+
+.vuln-sev-bar { width: 3px; border-radius: 2px; align-self: stretch; min-height: 36px; }
+
+.vuln-icon-wrap {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--bg4); border: 1px solid var(--bdr);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+
+.vuln-body { min-width: 0; }
+.vuln-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
+.vuln-desc  { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.vuln-meta  { font-family: var(--mono); font-size: 9px; color: var(--text3); margin-top: 3px; letter-spacing: .05em; }
+
+.vuln-guide-btn {
+  height: 26px; padding: 0 9px; flex-shrink: 0;
+  background: transparent; border: 1px solid var(--bdr2);
+  border-radius: 5px; color: var(--text3);
+  font-family: var(--mono); font-size: 9px;
+  cursor: pointer; transition: all .2s; text-decoration: none;
+  display: inline-flex; align-items: center;
+}
+.vuln-guide-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.vuln-resolve-btn {
+  height: 26px; width: 26px; flex-shrink: 0;
+  background: transparent; border: 1px solid var(--bdr);
+  border-radius: 5px; color: var(--text3);
+  font-size: 12px; cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.vuln-resolve-btn:hover { border-color: var(--green); color: var(--green); }
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+#toast-container {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.toast {
+  background: var(--bg3); border: 1px solid var(--bdr2);
+  border-radius: var(--r); padding: .75rem 1rem;
+  font-size: 13px; color: var(--text);
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+  animation: fadeIn .25s ease;
+  display: flex; align-items: center; gap: .75rem;
+  min-width: 260px; max-width: 360px;
+}
+.toast.success { border-color: rgba(0,229,160,.3); }
+.toast.error   { border-color: rgba(255,77,106,.3); }
+
+/* ── No account state ────────────────────────────────────────────────────── */
+#no-account {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; min-height: calc(100vh - var(--nav-h));
+  gap: 1rem; text-align: center; padding: 2rem;
+}
+.no-account-icon { font-size: 3rem; opacity: .4; margin-bottom: .5rem; }
+.no-account-title { font-size: 1.25rem; font-weight: 500; }
+.no-account-desc { font-size: 14px; color: var(--text2); max-width: 400px; line-height: 1.7; }
+.no-account-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green); color: var(--bg);
+  font-family: var(--mono); font-size: 12px; font-weight: 700;
+  padding: 10px 22px; border-radius: var(--r); text-decoration: none;
+  margin-top: .5rem; transition: background .2s;
+}
+.no-account-btn:hover { background: #00ffb3; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bdr3); }
+
+a { color: inherit; text-decoration: none; }
+
+/* ── Score Chart ─────────────────────────────────────────────────────────── */
+.chart-card { height: 200px; position: relative; }
+.chart-card canvas { position: absolute; inset: 0; }
+
+/* ── Realtime indicator ──────────────────────────────────────────────────── */
+.realtime-dot {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--mono); font-size: 9px; letter-spacing: .06em;
+  color: var(--text3);
+}
+.realtime-dot::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text4);
+  transition: background .3s;
+}
+.realtime-dot.live::before {
+  background: var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+.realtime-flash {
+  animation: realtimeFlash .6s ease;
+}
+@keyframes realtimeFlash {
+  0%   { box-shadow: 0 0 0 0 rgba(0,229,160,.4); }
+  50%  { box-shadow: 0 0 0 8px rgba(0,229,160,.0); }
+  100% { box-shadow: none; }
+}
+
+/* ── Auto-refresh badge ──────────────────────────────────────────────────── */
+.refresh-timer {
+  font-family: var(--mono); font-size: 9px;
+  color: var(--text3); letter-spacing: .06em;
+}
+
+
+/* ── Unresolved Events ───────────────────────────────────────────────────── */
+.unresolved-list { display:flex; flex-direction:column; gap:.5rem; }
+
+.unresolved-item {
+  display:grid;
+  grid-template-columns: 3px 32px 1fr auto;
+  align-items:start; gap:.75rem;
+  background:var(--bg3); border:1px solid var(--bdr);
+  border-radius:var(--r); padding:.875rem;
+  transition:border-color .2s, opacity .3s;
+  animation: fadeIn .3s ease both;
+}
+.unresolved-item:hover { border-color:var(--bdr2); }
+.unresolved-item.resolving { opacity:.4; pointer-events:none; }
+
+.unresolved-sev-bar { width:3px; border-radius:2px; align-self:stretch; min-height:36px; }
+.unresolved-icon { font-size:16px; padding-top:2px; }
+.unresolved-body { min-width:0; }
+.unresolved-title { font-size:13px; font-weight:500; color:var(--text); margin-bottom:2px; line-height:1.4; }
+.unresolved-desc  { font-size:11px; color:var(--text2); line-height:1.5;
+                    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.unresolved-meta  { font-family:var(--mono); font-size:9px; color:var(--text3); margin-top:3px; }
+
+.unresolved-resolve-btn {
+  height:28px; width:28px; flex-shrink:0;
+  background:transparent; border:1px solid var(--bdr);
+  border-radius:5px; color:var(--text3);
+  font-size:12px; cursor:pointer; transition:all .2s;
+  display:flex; align-items:center; justify-content:center;
+}
+.unresolved-resolve-btn:hover { border-color:var(--green); color:var(--green); }
+
+.unresolved-count-badge {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:18px; height:18px; padding:0 5px;
+  background:var(--red); color:#fff;
+  border-radius:9px; font-family:var(--mono);
+  font-size:9px; font-weight:700; margin-left:6px;
+  vertical-align:middle;
+}
+
+
+/* ── Schedule & Quota Info ───────────────────────────────────────────────── */
+.schedule-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:var(--bg3); border:1px solid var(--bdr2); border-radius:20px;
+  padding:3px 10px; font-family:var(--mono); font-size:9px;
+  color:var(--text3); letter-spacing:.06em;
+}
+.schedule-badge.active { color:var(--blue); border-color:rgba(77,159,255,.25); }
+
+.quota-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; margin-top:6px; overflow:hidden; }
+.quota-bar      { height:100%; background:var(--green); border-radius:2px; transition:width .8s ease; }
+.quota-bar.warn { background:var(--orange); }
+.quota-bar.full { background:var(--red); }
+
+.domain-list { display:flex; flex-direction:column; gap:.375rem; }
+.domain-row  {
+  display:flex; align-items:center; justify-content:space-between; gap:.75rem;
+  background:var(--bg3); border:1px solid var(--bdr); border-radius:6px;
+  padding:8px 12px;
+}
+.domain-row-name { font-family:var(--mono); font-size:12px; color:var(--text); }
+.domain-row-meta { font-size:11px; color:var(--text3); }
+.domain-row-score { font-family:var(--mono); font-size:11px; font-weight:700; }
+.domain-scan-btn {
+  height:24px; padding:0 8px; background:transparent;
+  border:1px solid var(--bdr2); border-radius:4px;
+  color:var(--text3); font-family:var(--mono); font-size:9px;
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.domain-scan-btn:hover { border-color:var(--green); color:var(--green); }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <span class="login-logo-dot"></span>
+      CyberShield
+    </div>
+    <h1 class="login-title" data-en="Sign in to Dashboard" data-ko="대시보드 로그인">대시보드 로그인</h1>
+    <p class="login-sub" data-en="Monitor your security in real time." data-ko="내 서버 보안을 실시간으로 확인하세요.">내 서버 보안을 실시간으로 확인하세요.</p>
+
+    <div id="login-error" class="login-error"></div>
+
+    <!-- Email/Password form -->
+    <div id="form-login">
+      <div class="field">
+        <label data-en="EMAIL" data-ko="이메일">이메일</label>
+        <input id="email-inp" type="email" placeholder="you@company.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label data-en="PASSWORD" data-ko="비밀번호">비밀번호</label>
+        <input id="pw-inp" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" id="login-btn" onclick="doEmailLogin()">
+        <span data-en="Sign In →" data-ko="로그인 →">로그인 →</span>
+      </button>
+
+      <div class="divider" data-en="or" data-ko="또는">또는</div>
+
+      <button class="btn-google" onclick="doGoogleLogin()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
+        <span data-en="Continue with Google" data-ko="Google로 계속하기">Google로 계속하기</span>
+      </button>
+
+      <div class="login-toggle">
+        <span data-en="No account? " data-ko="계정이 없으신가요? ">계정이 없으신가요? </span>
+        <a onclick="toggleForm('signup')" data-en="Sign up" data-ko="회원가입">회원가입</a>
+      </div>
+    </div>
+
+    <!-- Sign-up form -->
+    <div id="form-signup" style="display:none">
+      <div class="field">
+        <label data-en="EMAIL" data-ko="이메일">이메일</label>
+        <input id="signup-email" type="email" placeholder="you@company.com">
+      </div>
+      <div class="field">
+        <label data-en="PASSWORD (min. 8 chars)" data-ko="비밀번호 (최소 8자)">비밀번호 (최소 8자)</label>
+        <input id="signup-pw" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn-primary" onclick="doSignup()">
+        <span data-en="Create Account →" data-ko="계정 만들기 →">계정 만들기 →</span>
+      </button>
+      <div class="login-toggle">
+        <span data-en="Already have an account? " data-ko="이미 계정이 있으신가요? ">이미 계정이 있으신가요? </span>
+        <a onclick="toggleForm('login')" data-en="Sign in" data-ko="로그인">로그인</a>
+      </div>
+    </div>
+
+  </div><!-- .login-card -->
+</div><!-- #login-screen -->
+
+
+<!-- ══════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <a href="/" class="nav-logo"><span class="nav-logo-dot"></span>CyberShield</a>
+    <span class="nav-domain" id="nav-domain">—</span>
+
+    <div class="nav-right">
+      <div id="scan-quota-badge" class="agent-badge online" style="gap:6px;padding:4px 10px">
+        <span style="font-family:var(--mono);font-size:10px" id="quota-txt">— / —</span>
+      </div>
+
+      <span class="schedule-badge" id="schedule-badge">—</span>
+      <button class="nav-rescan-btn" onclick="triggerRescan()" data-en="↺ Scan Now" data-ko="↺ 지금 스캔">↺ 지금 스캔</button>
+
+      <div class="lang-toggle">
+        <button class="lang-btn" data-l="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn on" data-l="ko" onclick="setLang('ko')">KO</button>
+      </div>
+
+      <div class="nav-user-btn" id="user-btn" onclick="toggleUserMenu()">
+        <span id="user-initial">?</span>
+        <div class="user-menu" id="user-menu">
+          <div class="user-menu-item" id="menu-email" style="font-size:11px;color:var(--text3);cursor:default"></div>
+          <div class="user-menu-sep"></div>
+          <a href="/register" class="user-menu-item" data-en="Manage Domains" data-ko="도메인 관리">도메인 관리</a>
+          <div class="user-menu-item danger" onclick="doSignOut()" data-en="Sign Out" data-ko="로그아웃">로그아웃</div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- Loading -->
+    <div id="loading-state">
+      <div class="loading-spinner"></div>
+      <div class="loading-text" data-en="LOADING SECURITY DATA..." data-ko="보안 데이터 불러오는 중...">보안 데이터 불러오는 중...</div>
+    </div>
+
+    <!-- No account linked -->
+    <div id="no-account">
+      <div class="no-account-icon">🌐</div>
+      <div class="no-account-title" data-en="No Domain Registered" data-ko="등록된 도메인이 없습니다">등록된 도메인이 없습니다</div>
+      <p class="no-account-desc"
+         data-en="Register your domain to start scanning. Get your security score, find vulnerabilities, and receive alerts — no installation required."
+         data-ko="도메인을 등록하면 바로 스캔이 시작됩니다. 설치 없이 보안 점수 확인, 취약점 탐지, 알림 수신이 가능합니다.">도메인을 등록하면 바로 스캔이 시작됩니다.</p>
+      <a href="/register" class="no-account-btn"
+         data-en="🔍 Register Domain — 1 min"
+         data-ko="🔍 도메인 등록 — 1분 완료">🔍 도메인 등록 — 1분 완료</a>
+    </div>
+
+    <!-- Dashboard content -->
+    <div id="dashboard-content">
+
+      <!-- Page header -->
+      <div class="page-header">
+        <div>
+          <div class="page-title" data-en="Security Dashboard" data-ko="보안 대시보드">보안 대시보드</div>
+          <div class="page-sub" id="page-sub-domain"></div>
+        </div>
+        <div class="page-time" id="last-updated"></div>
+      </div>
+
+      <!-- Row 1: Score + Top Actions + Blocked -->
+      <div class="grid-top">
+
+        <!-- 1. Score Widget -->
+        <div class="card score-widget">
+          <div class="card-label" data-en="SECURITY SCORE" data-ko="보안 점수">보안 점수</div>
+          <div class="score-hex-wrap">
+            <div class="score-hex">
+              <svg viewBox="0 0 100 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background hex -->
+                <polygon points="50,5 93,27.5 93,87.5 50,110 7,87.5 7,27.5" fill="var(--bg3)" stroke="var(--bdr2)" stroke-width="1.5"/>
+                <!-- Score arc (will be animated by JS) -->
+                <polygon id="score-hex-fill" points="50,5 93,27.5 93,87.5 50,110 7,87.5 7,27.5" fill="none" stroke-width="2.5" stroke-linecap="round" id="score-hex-stroke"/>
+              </svg>
+              <div class="score-hex-inner">
+                <div class="score-num" id="score-num">—</div>
+                <div class="score-denom">/100</div>
+              </div>
+            </div>
+            <div class="score-meta">
+              <div class="score-grade" id="score-grade">—</div>
+              <div class="score-grade-label" id="score-grade-label" data-en="Loading..." data-ko="불러오는 중...">불러오는 중...</div>
+              <div class="score-delta same" id="score-delta">—</div>
+            </div>
+          </div>
+          <div class="score-bar-wrap">
+            <div class="score-bar" id="score-bar" style="width:0%"></div>
+          </div>
+          <div style="margin-top:.75rem;font-size:11px;color:var(--text3);font-family:var(--mono)" id="score-time"></div>
+        </div>
+
+        <!-- 2. Top Actions -->
+        <div class="card">
+          <div class="card-label" data-en="⚡ ACTION REQUIRED" data-ko="⚡ 지금 해야 할 것">⚡ 지금 해야 할 것</div>
+          <div class="action-list" id="actions-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">✅</div>
+              <div data-en="All critical issues resolved!" data-ko="모든 긴급 이슈가 해결됐습니다!">모든 긴급 이슈가 해결됐습니다!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Blocked This Month -->
+        <div class="card">
+          <div class="card-label" data-en="BLOCKED THIS MONTH" data-ko="이번 달 차단 현황">이번 달 차단 현황</div>
+          <div class="blocked-total">
+            <div class="blocked-num" id="blocked-num">0</div>
+            <div class="blocked-label" data-en="connections blocked" data-ko="건 차단됨">건 차단됨</div>
+          </div>
+          <div class="country-bar-list" id="country-list">
+            <div style="font-size:12px;color:var(--text3)" data-en="No blocked connections this month" data-ko="이번 달 차단된 연결이 없습니다">이번 달 차단된 연결이 없습니다</div>
+          </div>
+        </div>
+
+      </div><!-- .grid-top -->
+
+      <!-- Row 1.5: Domain Management + Scan Quota -->
+      <div class="grid-domains" style="margin-bottom:1.125rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+
+          <!-- Registered Domains -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.875rem">
+              <div class="card-label" style="margin-bottom:0"
+                   data-en="REGISTERED DOMAINS" data-ko="등록된 도메인">등록된 도메인</div>
+              <a href="/register" style="font-family:var(--mono);font-size:9px;color:var(--green);
+                 text-decoration:none;letter-spacing:.06em"
+                 data-en="+ Add Domain" data-ko="+ 도메인 추가">+ 도메인 추가</a>
+            </div>
+            <div class="domain-list" id="domain-list">
+              <div style="font-size:12px;color:var(--text3)">—</div>
+            </div>
+          </div>
+
+          <!-- Scan Quota + Schedule -->
+          <div class="card">
+            <div class="card-label" data-en="SCAN QUOTA" data-ko="스캔 쿼터">스캔 쿼터</div>
+            <div style="margin-bottom:1rem">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <span style="font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text)"
+                      id="quota-used-num">—</span>
+                <span style="font-family:var(--mono);font-size:11px;color:var(--text3)"
+                      id="quota-limit-txt">/ — 회</span>
+              </div>
+              <div class="quota-bar-wrap">
+                <div class="quota-bar" id="quota-bar" style="width:0%"></div>
+              </div>
+              <div style="font-size:11px;color:var(--text3);margin-top:5px"
+                   id="quota-reset-txt"></div>
+            </div>
+            <div style="border-top:1px solid var(--bdr);padding-top:.75rem">
+              <div class="card-label" style="margin-bottom:.5rem"
+                   data-en="AUTO SCAN" data-ko="자동 스캔 주기">자동 스캔 주기</div>
+              <div id="schedule-info" style="font-size:12px;color:var(--text2)">—</div>
+              <div id="schedule-upgrade" style="display:none;margin-top:.5rem">
+                <a href="/#pricing" style="font-family:var(--mono);font-size:9px;
+                   color:var(--orange);text-decoration:none;letter-spacing:.06em"
+                   data-en="↑ Upgrade for auto-scan" data-ko="↑ 업그레이드하면 자동 스캔">↑ 업그레이드하면 자동 스캔</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- .grid-domains -->
+
+      <!-- Row 1.6: Unresolved Security Events -->
+
+      <div id="unresolved-section" style="margin-bottom:1.125rem;display:none">
+        <div class="card">
+          <div style="display:flex;align-items:center;margin-bottom:1rem">
+            <div class="card-label" style="margin-bottom:0"
+                 data-en="⚠ UNRESOLVED SECURITY EVENTS"
+                 data-ko="⚠ 미해결 보안 이벤트">⚠ 미해결 보안 이벤트</div>
+            <span class="unresolved-count-badge" id="unresolved-count">0</span>
+            <div style="margin-left:auto;font-size:11px;color:var(--text3)"
+                 data-en="Click ✓ to mark as reviewed"
+                 data-ko="✓ 클릭 시 확인 처리됩니다">✓ 클릭 시 확인 처리됩니다</div>
+          </div>
+          <div class="unresolved-list" id="unresolved-list"></div>
+        </div>
+      </div>
+
+      <!-- Row 2: Event Feed + Vulnerability list -->
+      <div class="grid-mid">
+
+        <!-- 4. Event Feed -->
+        <div class="card">
+          <div class="card-label" data-en="SECURITY EVENTS — LAST 7 DAYS" data-ko="보안 이벤트 — 최근 7일">보안 이벤트 — 최근 7일</div>
+          <div class="event-feed" id="event-feed">
+            <div class="empty-state">
+              <div class="empty-state-icon">🛡</div>
+              <div data-en="No security events in the last 7 days" data-ko="최근 7일간 보안 이벤트가 없습니다">최근 7일간 보안 이벤트가 없습니다</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. Vulnerabilities -->
+        <div class="card">
+          <div class="card-label" data-en="VULNERABILITIES" data-ko="취약점 목록">취약점 목록</div>
+          <div class="vuln-filters" id="vuln-filters">
+            <button class="vuln-filter-btn active" onclick="filterVulns('all')" data-en="All" data-ko="전체">전체</button>
+            <button class="vuln-filter-btn" onclick="filterVulns('critical')" data-en="Critical" data-ko="치명적">치명적</button>
+            <button class="vuln-filter-btn" onclick="filterVulns('high')" data-en="High" data-ko="높음">높음</button>
+            <button class="vuln-filter-btn" onclick="filterVulns('medium')" data-en="Medium" data-ko="중간">중간</button>
+          </div>
+          <div class="vuln-list" id="vuln-list">
+            <div class="empty-state">
+              <div class="empty-state-icon">✅</div>
+              <div data-en="No open vulnerabilities" data-ko="열린 취약점이 없습니다">열린 취약점이 없습니다</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- .grid-mid -->
+
+      <!-- Row 3: 30-day Score Chart -->
+      <div class="grid-bottom">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+            <div class="card-label" data-en="SECURITY SCORE — 30 DAYS" data-ko="보안 점수 — 30일 추이">보안 점수 — 30일 추이</div>
+            <div style="display:flex;align-items:center;gap:.875rem">
+              <span class="realtime-dot" id="realtime-status" data-en="Connecting..." data-ko="연결 중...">연결 중...</span>
+              <span class="refresh-timer" id="refresh-timer"></span>
+            </div>
+          </div>
+          <div class="chart-card">
+            <canvas id="score-chart"></canvas>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:.75rem">
+            <div style="font-size:11px;color:var(--text3)" id="chart-range"></div>
+            <div style="font-size:11px;color:var(--text3)" id="chart-avg"></div>
+          </div>
+        </div>
+      </div><!-- .grid-bottom -->
+
+    </div><!-- #dashboard-content -->
+  </div><!-- .main-content -->
+</div><!-- #app -->
+
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+// ── Config ─────────────────────────────────────────────────────────────────
+const SB_URL  = document.querySelector('meta[name="supabase-url"]')?.content  || '';
+const SB_ANON = document.querySelector('meta[name="supabase-anon"]')?.content || '';
+const API     = (document.querySelector('meta[name="api-url"]')?.content || '').replace(/\/+$/,'');
+
+// Validate config on load — catch missing anon key early
+if (!SB_ANON || SB_ANON === 'YOUR-ANON-KEY' || SB_ANON.length < 20) {
+  console.error('❌ Supabase anon key is not configured in dashboard.html meta tag!');
+}
+
+// Supabase client
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_ANON);
+
+// ── State ───────────────────────────────────────────────────────────────────
+let _lang  = localStorage.getItem('cs_lang') || 'ko';
+let _data  = null;          // cached dashboard data
+let _vulnFilter = 'all';
+
+// ── i18n ────────────────────────────────────────────────────────────────────
+function setLang(l) {
+  _lang = l;
+  localStorage.setItem('cs_lang', l);
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === l));
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const txt = el.getAttribute('data-' + l);
+    if (txt === null) return;
+    if (el.tagName === 'INPUT') el.placeholder = txt;
+    else el.innerHTML = txt;
+  });
+  document.documentElement.lang = l;
+  if (_data) renderDashboard(_data); // re-render with new language
+}
+setLang(_lang);
+
+// ── Auth ────────────────────────────────────────────────────────────────────
+function toggleForm(mode) {
+  document.getElementById('form-login').style.display  = mode==='login'  ? '' : 'none';
+  document.getElementById('form-signup').style.display = mode==='signup' ? '' : 'none';
+  document.getElementById('login-error').style.display = 'none';
+}
+
+async function doEmailLogin() {
+  const email = document.getElementById('email-inp').value.trim();
+  const pw    = document.getElementById('pw-inp').value;
+  const btn   = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  if (!email || !pw) {
+    showLoginError(_lang==='ko' ? '이메일과 비밀번호를 입력해주세요.' : 'Please enter your email and password.');
+    return;
+  }
+
+  // Validate SB_ANON key is set
+  if (!SB_ANON || SB_ANON === 'YOUR-ANON-KEY' || SB_ANON.length < 20) {
+    showLoginError('Configuration error: Supabase key not set. Contact support.');
+    console.error('SB_ANON is not configured correctly:', SB_ANON);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = _lang==='ko' ? '로그인 중...' : 'Signing in...';
+
+  try {
+    console.log('Attempting login for:', email, '| SB_URL:', SB_URL, '| Key length:', SB_ANON?.length);
+    const { data: loginData, error } = await sb.auth.signInWithPassword({ email, password: pw });
+
+    if (error) {
+      console.error('Login error:', error.message, error);
+      const errMsg = {
+        'Invalid login credentials':   _lang==='ko' ? '이메일 또는 비밀번호가 올바르지 않습니다.' : 'Incorrect email or password.',
+        'Email not confirmed':         _lang==='ko' ? '이메일 인증이 필요합니다. 받은 메일을 확인하세요.' : 'Please confirm your email first.',
+        'Too many requests':           _lang==='ko' ? '잠시 후 다시 시도해주세요.' : 'Too many attempts. Please wait.',
+      };
+      showLoginError(errMsg[error.message] || error.message);
+      btn.disabled = false;
+      btn.innerHTML = _lang==='ko' ? '로그인 →' : 'Sign In →';
+      return;
+    }
+
+    console.log('Login response:', loginData);
+
+    if (loginData?.session) {
+      await _handleSession(loginData.session);
+    } else {
+      // No session in response — try getSession fallback
+      console.warn('No session in signIn response, trying getSession...');
+      const { data: fallback } = await sb.auth.getSession();
+      if (fallback?.session) {
+        await _handleSession(fallback.session);
+      } else {
+        showLoginError(_lang==='ko' ? '로그인 실패. 다시 시도해주세요.' : 'Login failed. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = _lang==='ko' ? '로그인 →' : 'Sign In →';
+      }
+    }
+  } catch(e) {
+    console.error('Login exception:', e);
+    showLoginError(_lang==='ko' ? '네트워크 오류. 인터넷 연결을 확인하세요.' : 'Network error. Check your connection.');
+    btn.disabled = false;
+    btn.innerHTML = _lang==='ko' ? '로그인 →' : 'Sign In →';
+  }
+}
+
+// Shared session handler — called after any successful login
+async function _handleSession(s) {
+  const userEmail = s.user?.email || '';
+  console.log('Session OK for:', userEmail);
+  document.getElementById('user-initial').textContent = userEmail[0]?.toUpperCase() || '?';
+  document.getElementById('menu-email').textContent   = userEmail;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display        = 'block';
+  if (!_pollingStarted) {
+    _pollingStarted = true;
+    startPolling();
+    initRealtime(s.access_token);
+  }
+  await loadDashboard(s.access_token);
+}
+
+async function doGoogleLogin() {
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://digitalcybershield.com/dashboard' },
+  });
+}
+
+async function doSignup() {
+  const email = document.getElementById('signup-email').value.trim();
+  const pw    = document.getElementById('signup-pw').value;
+  if (!email || pw.length < 8) {
+    showLoginError(_lang==='ko' ? '이메일과 8자 이상 비밀번호를 입력하세요.' : 'Enter email and password (min 8 chars).');
+    return;
+  }
+  const { data: signupData, error } = await sb.auth.signUp({ email, password: pw });
+  if (error) { showLoginError(error.message); return; }
+
+  if (signupData?.session) {
+    await _handleSession(signupData.session);
+  } else {
+    // Email confirmation is ON
+    showLoginError(_lang==='ko'
+      ? '✓ 가입 완료! 이메일에서 확인 링크를 클릭해주세요.'
+      : '✓ Signed up! Check your email for the confirmation link.', 'success');
+  }
+}
+
+async function doSignOut() {
+  stopPolling();
+  if (_realtimeChannel) sb.removeChannel(_realtimeChannel);
+  await sb.auth.signOut();
+  location.reload();
+}
+
+function showLoginError(msg, type='error') {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = type==='success' ? 'rgba(0,229,160,.12)' : 'rgba(255,77,106,.12)';
+  el.style.borderColor = type==='success' ? 'rgba(0,229,160,.3)' : 'rgba(255,77,106,.3)';
+  el.style.color = type==='success' ? 'var(--green)' : 'var(--red)';
+}
+
+// Enter key on login form
+document.getElementById('pw-inp').addEventListener('keydown', e => { if(e.key==='Enter') doEmailLogin(); });
+
+// ── Auth state listener ─────────────────────────────────────────────────────
+// _pollingStarted: true once startPolling() has been called for this page load.
+// Prevents duplicate intervals when Supabase fires multiple events.
+let _pollingStarted = false;
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (session) {
+    if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+      // _handleSession is defined above — handles nav, polling, dashboard load
+      await _handleSession(session);
+    } else {
+      // TOKEN_REFRESHED etc: just update nav silently
+      const email = session.user.email || '';
+      document.getElementById('user-initial').textContent = email[0]?.toUpperCase() || '?';
+      document.getElementById('menu-email').textContent = email;
+    }
+  } else {
+    _pollingStarted = false;
+    stopPolling();
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+// ── Dashboard data ──────────────────────────────────────────────────────────
+// silent=true → 백그라운드 갱신 (로딩 화면 없이 데이터만 교체)
+// silent=false → 최초 로딩 시 (로딩 스피너 표시)
+async function loadDashboard(token, silent = false) {
+  const loadingEl  = document.getElementById('loading-state');
+  const contentEl  = document.getElementById('dashboard-content');
+  const noAcctEl   = document.getElementById('no-account');
+
+  if (!silent) {
+    // 최초 로딩만 스피너 표시
+    loadingEl.style.display  = 'flex';
+    contentEl.style.display  = 'none';
+    noAcctEl.style.display   = 'none';
+  }
+
+  try {
+    const res = await fetch(API + '/dashboard/me', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+
+    if (res.status === 404) {
+      loadingEl.style.display = 'none';
+      noAcctEl.style.display  = 'flex';
+      contentEl.style.display = 'none';
+      return;
+    }
+
+    if (!res.ok) throw new Error('Server error ' + res.status);
+
+    const data = await res.json();
+    _data = data;
+    renderDashboard(data);   // renderDashboard hides loader, shows content
+
+  } catch(err) {
+    loadingEl.style.display = 'none';
+    if (!silent) {
+      // 최초 로딩 실패만 에러 toast
+      showToast('❌ ' + (_lang==='ko' ? '데이터 로드 실패: ' : 'Load failed: ') + err.message, 'error');
+      contentEl.style.display = 'block';
+    }
+    // silent 실패는 조용히 넘김 — 다음 폴링에서 재시도
+  }
+}
+
+// ── Render ──────────────────────────────────────────────────────────────────
+function renderDashboard(d) {
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('dashboard-content').style.display = 'block';
+
+  const ko = _lang === 'ko';
+
+  // ── Nav & header ──────────────────────────────────────────────────────────
+  const domain = d.customer?.domain || '—';
+  document.getElementById('nav-domain').textContent = domain;
+  document.getElementById('page-sub-domain').textContent = domain;
+
+  // Scan quota badge
+  const quota = d.quota || {};
+  const quotaTxt = document.getElementById('quota-txt');
+  if (quotaTxt) {
+    if (quota.unlimited) {
+      quotaTxt.textContent = ko ? '스캔 무제한' : 'Unlimited scans';
+      document.getElementById('scan-quota-badge').className = 'agent-badge online';
+    } else {
+      const rem = quota.remaining ?? 0;
+      quotaTxt.textContent = ko
+        ? `스캔 ${quota.used}/${quota.limit}회`
+        : `${quota.used}/${quota.limit} scans`;
+      document.getElementById('scan-quota-badge').className =
+        'agent-badge ' + (rem > 0 ? 'online' : 'offline');
+    }
+  }
+
+  // Domain list in nav sub-text
+  const navDomain = document.getElementById('nav-domain');
+  if (navDomain) {
+    const domains = d.customer?.domains || [];
+    if (domains.length > 1) {
+      navDomain.textContent = `${d.customer?.domain} +${domains.length-1}`;
+    } else {
+      navDomain.textContent = d.customer?.domain || '—';
+    }
+  }
+
+  // ── Tier / schedule badge ─────────────────────────────────────────────────
+  const tier = d.customer?.tier || 'free';
+  const lastUpdated = d.ts ? new Date(d.ts).toLocaleString(ko ? 'ko-KR' : 'en-US', { dateStyle:'short', timeStyle:'short' }) : '';
+  document.getElementById('last-updated').textContent =
+    (ko ? '마지막 업데이트: ' : 'Last updated: ') + lastUpdated;
+
+  // Schedule badge in nav
+  const schBadge = document.getElementById('schedule-badge');
+  const schedule = d.customer?.schedule || 'none';
+  if (schBadge) {
+    const schLabels = { none: ko?'자동스캔 없음':'No auto-scan',
+                        weekly: ko?'주 1회 자동':'Weekly auto',
+                        daily:  ko?'매일 자동':'Daily auto' };
+    schBadge.textContent = schLabels[schedule] || schedule;
+    schBadge.className = 'schedule-badge' + (schedule !== 'none' ? ' active' : '');
+  }
+
+  // ── Domain list widget ─────────────────────────────────────────────────────
+  const domains = d.customer?.domains || [];
+  const domainListEl = document.getElementById('domain-list');
+  if (domainListEl) {
+    if (!domains.length) {
+      domainListEl.innerHTML = `<div style="font-size:12px;color:var(--text3)">${ko ? '등록된 도메인이 없습니다' : 'No domains registered'}</div>`;
+    } else {
+      domainListEl.innerHTML = domains.map(dom => {
+        const scoreVal = dom.last_score ?? '—';
+        const gradeVal = dom.last_grade || '';
+        const scoreColor = typeof scoreVal === 'number'
+          ? (scoreVal >= 80 ? 'var(--green)' : scoreVal >= 55 ? 'var(--orange)' : 'var(--red)')
+          : 'var(--text3)';
+        const nextScan = dom.next_scan
+          ? new Date(dom.next_scan).toLocaleDateString(ko ? 'ko-KR' : 'en-US', {month:'short',day:'numeric'})
+          : (ko ? '미예약' : 'Not scheduled');
+        return `
+          <div class="domain-row">
+            <div>
+              <div class="domain-row-name">${escHtml(dom.domain)}${dom.is_primary ? ' <span style="font-size:9px;color:var(--text3)">' + (ko?'(기본)':'(primary)') + '</span>' : ''}</div>
+              <div class="domain-row-meta">${ko?'다음 스캔: ':'Next: '}${nextScan}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="domain-row-score" style="color:${scoreColor}">${scoreVal}${gradeVal ? ' ('+gradeVal+')' : ''}</span>
+              <button class="domain-scan-btn" onclick="triggerRescan('${escHtml(dom.domain)}')">${ko?'스캔':'Scan'}</button>
+            </div>
+          </div>`;
+      }).join('');
+    }
+  }
+
+  // ── Quota widget ───────────────────────────────────────────────────────────
+  // quota already declared above — reuse it
+  const quotaUsedEl  = document.getElementById('quota-used-num');
+  const quotaLimitEl = document.getElementById('quota-limit-txt');
+  const quotaBarEl   = document.getElementById('quota-bar');
+  const quotaResetEl = document.getElementById('quota-reset-txt');
+  const schInfoEl    = document.getElementById('schedule-info');
+  const schUpgradeEl = document.getElementById('schedule-upgrade');
+
+  if (quotaUsedEl) {
+    if (quota.unlimited) {
+      quotaUsedEl.textContent  = '∞';
+      if (quotaLimitEl) quotaLimitEl.textContent = ko ? '무제한' : 'Unlimited';
+      if (quotaBarEl)  { quotaBarEl.style.width = '100%'; quotaBarEl.className = 'quota-bar'; }
+    } else {
+      quotaUsedEl.textContent = quota.used ?? 0;
+      if (quotaLimitEl) quotaLimitEl.textContent = ko ? `/ ${quota.limit}회` : `/ ${quota.limit}`;
+      const pct = quota.limit > 0 ? Math.min(100, Math.round((quota.used / quota.limit) * 100)) : 0;
+      if (quotaBarEl) {
+        quotaBarEl.style.width = pct + '%';
+        quotaBarEl.className   = 'quota-bar' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
+      }
+      // Reset date (1st of next month)
+      const nextReset = new Date();
+      nextReset.setMonth(nextReset.getMonth() + 1, 1);
+      nextReset.setHours(0,0,0,0);
+      if (quotaResetEl) quotaResetEl.textContent =
+        (ko ? '다음 리셋: ' : 'Resets: ') +
+        nextReset.toLocaleDateString(ko ? 'ko-KR' : 'en-US', {month:'long',day:'numeric'});
+    }
+  }
+
+  if (schInfoEl) {
+    const schText = {
+      none:   ko ? '자동 스캔 없음 (수동만 가능)' : 'Manual scans only',
+      weekly: ko ? '매주 월요일 자동 스캔'         : 'Auto-scan every Monday',
+      daily:  ko ? '매일 자동 스캔'               : 'Auto-scan every day',
+    };
+    schInfoEl.textContent = schText[schedule] || schedule;
+    if (schUpgradeEl) schUpgradeEl.style.display = (schedule === 'none' && tier === 'free') ? 'block' : 'none';
+  }
+
+  // ── Score ─────────────────────────────────────────────────────────────────
+  const score = d.score?.current ?? 0;
+  const grade = d.score?.grade || 'F';
+  const delta = d.score?.delta ?? 0;
+  const scoreColor = score >= 80 ? 'var(--green)' : score >= 55 ? 'var(--orange)' : 'var(--red)';
+  const gradeLabels = {
+    'A+':'최상위 보안', 'A':'양호', 'B':'개선 필요',
+    'C':'취약', 'D':'위험', 'F':'치명적 위험'
+  };
+  const gradeLabelsEn = {
+    'A+':'Excellent', 'A':'Good', 'B':'Needs Work',
+    'C':'Poor', 'D':'Dangerous', 'F':'Critical Risk'
+  };
+
+  document.getElementById('score-num').textContent  = score;
+  document.getElementById('score-num').style.color   = scoreColor;
+  document.getElementById('score-grade').textContent  = grade;
+  document.getElementById('score-grade').style.color  = scoreColor;
+  document.getElementById('score-grade-label').textContent =
+    ko ? (gradeLabels[grade] || grade) : (gradeLabelsEn[grade] || grade);
+  document.getElementById('score-bar').style.width    = score + '%';
+  document.getElementById('score-bar').style.background = scoreColor;
+
+  // Hex stroke color
+  const hexStroke = document.getElementById('score-hex-stroke');
+  if (hexStroke) hexStroke.setAttribute('stroke', scoreColor);
+
+  // Delta
+  const deltaEl = document.getElementById('score-delta');
+  if (delta > 0) {
+    deltaEl.textContent = '+' + delta + (ko ? '점 ↑ 지난주 대비' : ' pts ↑ vs last week');
+    deltaEl.className = 'score-delta up';
+  } else if (delta < 0) {
+    deltaEl.textContent = delta + (ko ? '점 ↓ 지난주 대비' : ' pts ↓ vs last week');
+    deltaEl.className = 'score-delta down';
+  } else {
+    deltaEl.textContent = ko ? '변화 없음' : 'No change';
+    deltaEl.className = 'score-delta same';
+  }
+
+  const lastScanned = d.score?.last_scanned;
+  if (lastScanned) {
+    const scanDate = new Date(lastScanned).toLocaleString(ko ? 'ko-KR' : 'en-US', { dateStyle:'short', timeStyle:'short' });
+    document.getElementById('score-time').textContent = (ko ? '최근 스캔: ' : 'Last scan: ') + scanDate;
+  }
+
+  // ── Top Actions ───────────────────────────────────────────────────────────
+  const actions = d.top_actions || [];
+  const actList = document.getElementById('actions-list');
+  if (actions.length === 0) {
+    actList.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div><div>${ko ? '모든 긴급 이슈가 해결됐습니다!' : 'All critical issues resolved!'}</div></div>`;
+  } else {
+    actList.innerHTML = actions.map((a, i) => {
+      const sev    = a.severity || 'low';
+      const title  = ko ? (a.title_ko || a.title) : a.title;
+      const action = ko ? (a.action_ko || a.action) : a.action;
+      const sevNames = { critical: ko?'치명적':'Critical', high: ko?'높음':'High', medium: ko?'중간':'Medium', low: ko?'낮음':'Low' };
+      return `
+        <div class="action-item" style="animation-delay:${i*.08}s">
+          <div class="action-sev-bar bg-${sev === 'medium' ? 'med' : sev === 'critical' ? 'crit' : sev === 'high' ? 'high' : 'low'}"></div>
+          <div class="action-body">
+            <span class="action-tag bgfade-${sev === 'medium' ? 'med' : sev === 'critical' ? 'crit' : sev === 'high' ? 'high' : 'low'} sev-${sev === 'medium' ? 'med' : sev === 'critical' ? 'crit' : sev === 'high' ? 'high' : 'low'}">${sevNames[sev] || sev}</span>
+            <div class="action-title">${escHtml(title || '')}</div>
+            <div class="action-desc">${escHtml(action || '')}</div>
+          </div>
+          ${a.guide ? `<a href="${a.guide}" class="action-btn" target="_blank">${ko ? '가이드' : 'Guide'} →</a>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // ── Blocked Stats ─────────────────────────────────────────────────────────
+  const blocked = d.blocked || { total: 0, by_country: [] };
+  document.getElementById('blocked-num').textContent = blocked.total || 0;
+  const countryList = document.getElementById('country-list');
+  if (!blocked.by_country?.length) {
+    countryList.innerHTML = `<div style="font-size:12px;color:var(--text3)">${ko ? '이번 달 차단된 연결이 없습니다' : 'No blocked connections this month'}</div>`;
+  } else {
+    const maxCount = blocked.by_country[0]?.count || 1;
+    countryList.innerHTML = blocked.by_country.map(c => {
+      const pct = Math.round((c.count / maxCount) * 100);
+      return `
+        <div class="country-item">
+          <span class="country-name">${escHtml(c.country)}</span>
+          <div class="country-bar-wrap"><div class="country-bar" style="width:${pct}%"></div></div>
+          <span class="country-count">${c.count}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Event Feed ────────────────────────────────────────────────────────────
+  const events = d.events || [];
+  const feedEl = document.getElementById('event-feed');
+  if (!events.length) {
+    feedEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🛡</div><div>${ko ? '최근 7일간 보안 이벤트가 없습니다' : 'No security events in the last 7 days'}</div></div>`;
+  } else {
+    feedEl.innerHTML = events.slice(0, 12).map((e, i) => {
+      const sev   = e.severity || 'info';
+      const title = ko ? (e.title_ko || e.title) : e.title;
+      const desc  = ko ? (e.desc_ko  || e.desc)  : e.desc;
+      const dotColor = { critical:'var(--crit)', high:'var(--high)', medium:'var(--med)', low:'var(--low)', info:'var(--text3)' }[sev] || 'var(--text3)';
+      return `
+        <div class="event-item" style="animation-delay:${i*.05}s">
+          <div class="event-icon-wrap">
+            <span>${e.icon || '⚠️'}</span>
+            <span class="event-dot" style="background:${dotColor}"></span>
+          </div>
+          <div class="event-body">
+            <div class="event-title">${escHtml(title)}</div>
+            <div class="event-desc">${escHtml(desc)}</div>
+            ${e.source_ip ? `<div class="event-ip">${e.source_ip}${e.port ? ':'+e.port : ''}</div>` : ''}
+          </div>
+          <div class="event-time">${e.ago || ''}</div>
+        </div>`;
+    }).join('');
+  }
+
+  // ── Vulnerabilities ───────────────────────────────────────────────────────
+  _data = d;
+  renderVulns(d.vulnerabilities || []);
+
+  // ── Unresolved Events ─────────────────────────────────────────────────────
+  renderUnresolvedEvents(d.unresolved_events || []);
+
+  // ── Score Chart ────────────────────────────────────────────────────────────
+  renderScoreChart(d.score_chart || []);
+}
+
+// ── Vulnerability rendering with filter ────────────────────────────────────
+function filterVulns(sev) {
+  _vulnFilter = sev;
+  document.querySelectorAll('.vuln-filter-btn').forEach(b => {
+    const bsev = b.getAttribute('onclick').match(/filterVulns\('(.+)'\)/)?.[1];
+    b.classList.toggle('active', bsev === sev);
+  });
+  if (_data) renderVulns(_data.vulnerabilities || []);
+}
+
+function renderVulns(vulns) {
+  const ko = _lang === 'ko';
+  const filtered = _vulnFilter === 'all' ? vulns : vulns.filter(v => v.severity === _vulnFilter);
+  const listEl = document.getElementById('vuln-list');
+
+  if (!filtered.length) {
+    listEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div><div>${ko ? '해당 취약점이 없습니다' : 'No vulnerabilities in this category'}</div></div>`;
+    return;
+  }
+
+  const catIcons = { ssl:'🔒', email:'📧', headers:'🛡', dns:'🌐', ports:'🔓', malware:'🦠', code:'💻' };
+  const sevNames = { critical: ko?'치명적':'Critical', high: ko?'높음':'High', medium: ko?'중간':'Medium', low: ko?'낮음':'Low' };
+
+  listEl.innerHTML = filtered.slice(0, 20).map((v, i) => {
+    const sev   = v.severity || 'low';
+    const title = ko ? (v.title_ko || v.title) : v.title;
+    const desc  = ko ? (v.desc_ko  || v.desc)  : v.desc;
+    const fix   = ko ? (v.fix_ko   || v.fix)   : v.fix;
+    const icon  = catIcons[v.category] || '⚠️';
+    const sevClass = sev === 'medium' ? 'med' : sev === 'critical' ? 'crit' : sev === 'high' ? 'high' : 'low';
+    return `
+      <div class="vuln-item" id="vuln-${v.id}" style="animation-delay:${i*.04}s">
+        <div class="vuln-sev-bar bg-${sevClass}"></div>
+        <div class="vuln-icon-wrap">${icon}</div>
+        <div class="vuln-body">
+          <div class="vuln-title">
+            <span style="font-size:10px;padding:1px 6px;border-radius:3px;margin-right:5px" class="bgfade-${sevClass} sev-${sevClass}">${sevNames[sev]}</span>
+            ${escHtml(title)}
+          </div>
+          <div class="vuln-desc">${escHtml(desc)}</div>
+          <div class="vuln-meta">${ko ? '권장 조치: ' : 'Fix: '}${escHtml(fix)}</div>
+          ${v.found ? `<div class="vuln-meta" style="margin-top:2px">${ko ? '발견일: ' : 'Found: '}${v.found}</div>` : ''}
+        </div>
+        ${v.guide ? `<a href="${v.guide}" class="vuln-guide-btn" target="_blank">${ko ? '가이드' : 'Guide'}</a>` : '<div></div>'}
+        <button class="vuln-resolve-btn" title="${ko ? '해결 완료로 표시' : 'Mark as resolved'}" onclick="resolveVuln('${v.id}', this)">✓</button>
+      </div>`;
+  }).join('');
+}
+
+// ── Actions ─────────────────────────────────────────────────────────────────
+async function resolveVuln(id, btn) {
+  const ko = _lang === 'ko';
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    const session = (await sb.auth.getSession()).data.session;
+    if (!session) throw new Error('Not logged in');
+    const res = await fetch(API + '/dashboard/resolve', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + session.access_token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ finding_id: String(id) }),
+    });
+    if (!res.ok) throw new Error('Error');
+    const item = document.getElementById('vuln-' + id);
+    if (item) {
+      item.classList.add('resolved');
+      setTimeout(() => item.remove(), 800);
+    }
+    showToast('✓ ' + (ko ? '해결 완료로 표시됐습니다.' : 'Marked as resolved.'));
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '✓';
+    showToast('❌ ' + (ko ? '처리 중 오류가 발생했습니다.' : 'Error occurred.'), 'error');
+  }
+}
+
+async function triggerRescan(domain) {
+  const ko  = _lang === 'ko';
+  const tier = _data?.customer?.tier || 'free';
+
+  // ── Quota check before even sending ──────────────────────────────────────
+  const quota = _data?.quota;
+  if (quota && !quota.unlimited && quota.remaining <= 0) {
+    showToast('❌ ' + (ko
+      ? `이번 달 스캔(${quota.limit}회)을 모두 사용했습니다. 업그레이드하면 더 스캔할 수 있습니다.`
+      : `Monthly limit reached (${quota.limit} scans). Upgrade for more.`), 'error');
+    return;
+  }
+
+  // Show tier label so user knows which scan depth is running
+  const tierLabel = {
+    free:  ko ? '기본 스캔 (6모듈)'  : 'Basic scan (6 modules)',
+    plus:  ko ? '심층 스캔 (10모듈)' : 'Deep scan (10 modules)',
+    max:   ko ? '전문가 스캔 (12모듈)': 'Expert scan (12 modules)',
+  }[tier] || tier;
+  showToast('🔍 ' + (ko ? `${tierLabel} 시작 중...` : `Starting ${tierLabel}...`));
+
+  try {
+    const session = (await sb.auth.getSession()).data.session;
+    if (!session) return;
+
+    const body = domain ? { domain } : {};
+    const res = await fetch(API + '/customer/scan/trigger', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + session.access_token,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (res.status === 429) {
+      const msg = data.detail?.message_ko || data.detail?.message_en || (ko ? '쿼터 초과' : 'Quota exceeded');
+      showToast('❌ ' + msg, 'error');
+      return;
+    }
+
+    showToast('✓ ' + (ko ? data.message_ko : data.message_en));
+
+    // Silent refresh after 90s
+    setTimeout(async () => {
+      const s2 = (await sb.auth.getSession()).data.session;
+      if (s2) await loadDashboard(s2.access_token, true);
+    }, 90000);
+    _pollCountdown = 30;  // also refresh sooner via polling
+  } catch(e) {
+    showToast('❌ ' + (ko ? '스캔 요청 실패' : 'Scan request failed'), 'error');
+  }
+}
+
+// ── User menu ────────────────────────────────────────────────────────────────
+function toggleUserMenu() {
+  document.getElementById('user-menu').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!document.getElementById('user-btn').contains(e.target))
+    document.getElementById('user-menu').classList.remove('open');
+});
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+function showToast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.innerHTML = `<span>${msg}</span>`;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+
+// ── Chart.js Score Line Chart ─────────────────────────────────────────────────
+let _scoreChart = null;
+
+function renderScoreChart(chartData) {
+  if (!chartData || chartData.length < 2) {
+    document.getElementById('chart-range').textContent =
+      _lang === 'ko' ? '스캔 데이터가 충분하지 않습니다 (최소 2회 필요)' : 'Not enough scan data (min. 2 scans needed)';
+    return;
+  }
+
+  const ko = _lang === 'ko';
+  const labels = chartData.map(d => {
+    const dt = new Date(d.date);
+    return dt.toLocaleDateString(ko ? 'ko-KR' : 'en-US', { month:'short', day:'numeric' });
+  });
+  const scores = chartData.map(d => d.score);
+  const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+
+  // Range info
+  const first = chartData[0]?.date?.slice(0, 10) || '';
+  const last  = chartData[chartData.length - 1]?.date?.slice(0, 10) || '';
+  document.getElementById('chart-range').textContent =
+    (ko ? '기간: ' : 'Period: ') + first + ' → ' + last;
+  document.getElementById('chart-avg').textContent =
+    (ko ? '평균 점수: ' : 'Avg score: ') + avg + '/100';
+
+  const ctx = document.getElementById('score-chart');
+  if (!ctx) return;
+
+  // Color based on latest score
+  const latest = scores[scores.length - 1] || 0;
+  const lineColor = latest >= 80 ? '#00e5a0' : latest >= 55 ? '#ffb547' : '#ff4d6a';
+
+  // Destroy existing chart before recreating
+  if (_scoreChart) { _scoreChart.destroy(); _scoreChart = null; }
+
+  _scoreChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data: scores,
+        borderColor: lineColor,
+        backgroundColor: lineColor + '18',
+        borderWidth: 2,
+        pointRadius: scores.length <= 10 ? 4 : 2,
+        pointHoverRadius: 6,
+        pointBackgroundColor: lineColor,
+        pointBorderColor: '#0c1220',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.35,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 800, easing: 'easeInOutQuart' },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111a2e',
+          borderColor: 'rgba(100,160,255,0.2)',
+          borderWidth: 1,
+          titleColor: '#d4e4ff',
+          bodyColor: '#7a98c4',
+          padding: 10,
+          callbacks: {
+            label: ctx => (ko ? '점수: ' : 'Score: ') + ctx.parsed.y + '/100',
+          }
+        },
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(100,160,255,0.05)', drawBorder: false },
+          ticks: { color: '#3a5070', font: { size: 10, family: "'IBM Plex Mono'" },
+                   maxTicksLimit: 8 },
+        },
+        y: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(100,160,255,0.05)', drawBorder: false },
+          ticks: { color: '#3a5070', font: { size: 10, family: "'IBM Plex Mono'" },
+                   callback: v => v + '%', stepSize: 20 },
+        },
+      },
+    },
+  });
+}
+
+// ── Supabase Realtime subscription ───────────────────────────────────────────
+let _realtimeChannel = null;
+
+async function initRealtime(token) {
+  const rtDot = document.getElementById('realtime-status');
+  try {
+    // Get subscription config from backend
+    const res = await fetch(API + '/dashboard/realtime-config', {
+      headers: { 'Authorization': 'Bearer ' + token },
+    });
+    if (!res.ok) throw new Error('config ' + res.status);
+    const cfg = await res.json();
+
+    // Create a dedicated Supabase client with anon key for Realtime
+    // (Realtime requires the anon key, not the session JWT)
+    const sbRt = supabase.createClient(cfg.supabase_url, cfg.anon_key);
+
+    // Clean up any existing subscription
+    if (_realtimeChannel) {
+      await sbRt.removeChannel(_realtimeChannel);
+      _realtimeChannel = null;
+    }
+
+    // Subscribe to scan_events INSERT for this customer
+    _realtimeChannel = sbRt
+      .channel(cfg.channel)
+      .on('postgres_changes', {
+        event:  'INSERT',
+        schema: 'public',
+        table:  cfg.table,
+        filter: cfg.filter,
+      }, (payload) => {
+        handleRealtimeEvent(payload.new);
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          rtDot.className = 'realtime-dot live';
+          rtDot.textContent = _lang === 'ko' ? '실시간 연결됨' : 'Live';
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          rtDot.className = 'realtime-dot';
+          rtDot.textContent = _lang === 'ko' ? '재연결 중...' : 'Reconnecting...';
+        }
+      });
+
+  } catch(e) {
+    console.warn('Realtime init failed (will use polling):', e.message);
+    if (rtDot) {
+      rtDot.className = 'realtime-dot';
+      rtDot.textContent = _lang === 'ko' ? '폴링 모드' : 'Polling';
+    }
+  }
+}
+
+function handleRealtimeEvent(evt) {
+  if (!evt) return;
+  const ko = _lang === 'ko';
+
+  // Flash the event feed card to show activity
+  const feedCard = document.getElementById('event-feed')?.closest('.card');
+  if (feedCard) feedCard.classList.add('realtime-flash');
+  setTimeout(() => feedCard?.classList.remove('realtime-flash'), 700);
+
+  // Prepend new event to the feed immediately (optimistic UI)
+  const feedEl = document.getElementById('event-feed');
+  if (feedEl && evt.event_type) {
+    const icons = {
+      scan_complete:     '🔍',
+      new_vulnerability: '⚠️',
+      score_change:      '📊',
+      scan_error:        '❌',
+    };
+    const sevColor = {critical:'var(--crit)',high:'var(--high)',medium:'var(--med)',low:'var(--low)',info:'var(--text3)'};
+    const sev = evt.severity || 'info';
+    const title = ko ? (evt.title_ko || evt.title || evt.event_type) : (evt.title || evt.event_type);
+    const desc  = ko ? (evt.description_ko || evt.description || '') : (evt.description || '');
+    const newItem = document.createElement('div');
+    newItem.className = 'event-item realtime-flash';
+    newItem.innerHTML = `
+      <div class="event-icon-wrap">
+        <span>${icons[evt.event_type] || '⚠️'}</span>
+        <span class="event-dot" style="background:${sevColor[sev] || sevColor.info}"></span>
+      </div>
+      <div class="event-body">
+        <div class="event-title">${title}</div>
+        <div class="event-desc">${desc}</div>
+        ${evt.source_ip ? `<div class="event-ip">${evt.source_ip}</div>` : ''}
+      </div>
+      <div class="event-time">${ko ? '방금 전' : 'just now'}</div>`;
+
+    // Remove empty state if present
+    feedEl.querySelector('.empty-state')?.remove();
+    feedEl.insertBefore(newItem, feedEl.firstChild);
+
+    // Show toast
+    showToast('🔴 ' + title, sev === 'critical' || sev === 'high' ? 'error' : 'success');
+
+    // Trim feed to 12 items
+    while (feedEl.children.length > 12) feedEl.removeChild(feedEl.lastChild);
+  }
+
+  // Realtime event received — do a silent background refresh after 3s
+  // Using setTimeout instead of resetting countdown to avoid race conditions
+  setTimeout(async () => {
+    const s = (await sb.auth.getSession()).data.session;
+    if (s) await loadDashboard(s.access_token, true);  // silent
+  }, 3000);
+}
+
+// ── Auto-refresh polling (5분 간격, silent) ───────────────────────────────────
+let _pollInterval = null;
+let _pollCountdown = 300;
+
+function startPolling() {
+  if (_pollInterval) {
+    console.warn('startPolling called while already running — ignored');
+    return;
+  }
+  _pollCountdown = 300;
+
+  const timerEl = document.getElementById('refresh-timer');
+  _pollInterval = setInterval(async () => {
+    _pollCountdown--;
+    if (_pollCountdown > 0) {
+      if (timerEl) {
+        if (_pollCountdown <= 60) {
+          timerEl.textContent = _lang === 'ko'
+            ? `${_pollCountdown}초 후 갱신`
+            : `Refresh in ${_pollCountdown}s`;
+        } else {
+          const min = Math.ceil(_pollCountdown / 60);
+          timerEl.textContent = _lang === 'ko'
+            ? `${min}분 후 자동 갱신`
+            : `Auto-refresh in ${min}m`;
+        }
+      }
+      return;
+    }
+    _pollCountdown = 300;
+    if (timerEl) timerEl.textContent = _lang === 'ko' ? '갱신 중...' : 'Refreshing...';
+    try {
+      const sess = (await sb.auth.getSession()).data.session;
+      if (sess) await loadDashboard(sess.access_token, true);
+    } catch(e) {
+      console.warn('Poll refresh failed:', e);
+    }
+  }, 1000);
+}
+
+function stopPolling() {
+  if (_pollInterval) { clearInterval(_pollInterval); _pollInterval = null; }
+}
+
+
+// ── Unresolved Events ─────────────────────────────────────────────────────────
+function renderUnresolvedEvents(events) {
+  const ko = _lang === 'ko';
+  const section = document.getElementById('unresolved-section');
+  const listEl  = document.getElementById('unresolved-list');
+  const badge   = document.getElementById('unresolved-count');
+
+  if (!events || events.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = 'block';
+  badge.textContent = events.length;
+
+  const icons = {
+    brute_force_login:      '🔐',
+    new_port_opened:        '🚪',
+    malicious_ip_connection:'🦠',
+    port_closed:            '⚠️',
+    domain_rescan:          '🔍',
+  };
+  const sevClass = s => s === 'critical' ? 'crit' : s === 'high' ? 'high' : s === 'medium' ? 'med' : 'low';
+  const sevNames = { critical: ko?'치명적':'Critical', high: ko?'높음':'High',
+                     medium: ko?'중간':'Medium', low: ko?'낮음':'Low' };
+
+  listEl.innerHTML = events.slice(0, 20).map((e, i) => {
+    const sev   = e.severity || 'low';
+    const sc    = sevClass(sev);
+    const title = ko ? (e.title_ko || e.title) : e.title;
+    const desc  = ko ? (e.desc_ko  || e.desc)  : e.desc;
+    const when  = e.ago || '';
+    const ip    = e.source_ip ? ` · ${e.source_ip}${e.port ? ':'+e.port : ''}` : '';
+    return `
+      <div class="unresolved-item" id="ue-${e.id}" style="animation-delay:${i*.04}s">
+        <div class="unresolved-sev-bar bg-${sc}"></div>
+        <div class="unresolved-icon">${icons[e.event_type] || '⚠️'}</div>
+        <div class="unresolved-body">
+          <div class="unresolved-title">
+            <span style="font-size:9px;padding:1px 6px;border-radius:3px;margin-right:5px"
+                  class="bgfade-${sc} sev-${sc}">${sevNames[sev]}</span>
+            ${escHtml(title)}
+          </div>
+          <div class="unresolved-desc">${escHtml(desc)}</div>
+          <div class="unresolved-meta">${when}${ip}</div>
+        </div>
+        <button class="unresolved-resolve-btn"
+                title="${ko ? '확인 완료로 표시' : 'Mark as reviewed'}"
+                onclick="resolveEvent('${e.id}', this)">✓</button>
+      </div>`;
+  }).join('');
+}
+
+async function resolveEvent(id, btn) {
+  const ko = _lang === 'ko';
+  const item = document.getElementById('ue-' + id);
+  if (item) item.classList.add('resolving');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const session = (await sb.auth.getSession()).data.session;
+    if (!session) throw new Error('Not logged in');
+
+    const res = await fetch(API + '/dashboard/resolve-event', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + session.access_token,
+                 'Content-Type': 'application/json' },
+      body: JSON.stringify({ finding_id: String(id) }),
+    });
+    if (!res.ok) throw new Error('Error ' + res.status);
+
+    // Remove from UI
+    setTimeout(() => {
+      item?.remove();
+      // Update badge count
+      const badge = document.getElementById('unresolved-count');
+      const list  = document.getElementById('unresolved-list');
+      if (badge && list) {
+        const remaining = list.querySelectorAll('.unresolved-item').length;
+        badge.textContent = remaining;
+        if (remaining === 0) {
+          document.getElementById('unresolved-section').style.display = 'none';
+        }
+      }
+    }, 400);
+
+    showToast('✓ ' + (ko ? '확인 처리됐습니다.' : 'Marked as reviewed.'));
+  } catch(e) {
+    if (item) item.classList.remove('resolving');
+    btn.disabled = false;
+    btn.textContent = '✓';
+    showToast('❌ ' + (ko ? '처리 실패' : 'Failed'), 'error');
+  }
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>

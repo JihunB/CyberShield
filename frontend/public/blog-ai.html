@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="Is AI-Generated Code Secure? — 7 Vulnerabilities in Claude·ChatGPT Code | CyberShield" data-ko="AI가 짜준 코드, 보안은 안전할까? — Claude·ChatGPT 생성 코드의 7가지 취약점 | CyberShield">AI 생성 코드의 7가지 취약점 | CyberShield</title>
+<meta name="description" content="AI 생성 코드는 일반 코드보다 보안 취약점이 3배 많습니다. 하드코딩된 API 키, CORS 와일드카드, JWT 검증 비활성화 — 실제 코드 예시로 설명합니다.">
+<meta property="og:title" content="AI가 짜준 코드, 보안은 안전할까? — Claude·ChatGPT 생성 코드의 7가지 취약점">
+<meta property="og:image" content="https://digitalcybershield.com/og-image.png">
+<link rel="canonical" href="https://digitalcybershield.com/blog/ai-code-security">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;background:rgba(167,139,250,.1);color:#a78bfa;border:1px solid rgba(167,139,250,.2);margin-bottom:1rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}
+strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0;position:relative}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+pre.bad{border-color:rgba(255,77,106,.4)}
+pre.bad::before{content:'❌ Vulnerable';position:absolute;top:8px;right:10px;font-family:'Space Mono',monospace;font-size:9px;color:var(--danger);letter-spacing:.06em}
+pre.good{border-color:rgba(0,229,160,.3)}
+pre.good::before{content:'✓ Secure';position:absolute;top:8px;right:10px;font-family:'Space Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:.06em}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.vuln-num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;background:var(--danger);color:white;border-radius:50%;font-family:var(--mono);font-size:11px;font-weight:700;flex-shrink:0;margin-right:8px;vertical-align:middle}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem 1.75rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" class="nav-back" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← Blog</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+
+<div class="container">
+  <span class="post-tag" data-en="Code Security" data-ko="코드 보안">코드 보안</span>
+  <h1 data-en="Is AI-Generated Code Secure?<br>7 Vulnerabilities Found in Claude &amp; ChatGPT Code" data-ko="AI가 짜준 코드, 보안은 안전할까?<br>Claude·ChatGPT 생성 코드의 7가지 취약점">AI가 짜준 코드, 보안은 안전할까?<br>Claude·ChatGPT 생성 코드의 7가지 취약점</h1>
+  <div class="meta" data-en="2026.04.10 · 8 min read · CyberShield" data-ko="2026.04.10 · 8분 읽기 · CyberShield">2026.04.10 · 8 min read · CyberShield</div>
+
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고 (AdSense 승인 후 활성화)">광고 (AdSense 승인 후 활성화)</div>
+
+  <p data-en="A 2024 Stanford study found AI-generated code has <strong>3x more security vulnerabilities</strong> than human-written code." data-ko="2024년 Stanford 연구에 따르면 AI 생성 코드에는 인간이 작성한 코드보다 <strong>3배 많은 보안 취약점</strong>이 존재합니다.">2024년 Stanford 연구에 따르면 AI 생성 코드에는 인간이 작성한 코드보다 <strong>3배 많은 보안 취약점</strong>이 존재합니다. AI는 "작동하는 코드"를 만드는 데는 탁월하지만, "안전한 코드"를 만드는 데는 아직 한계가 있습니다.</p>
+  <p>Claude, ChatGPT, GitHub Copilot이 생성하는 코드에서 가장 자주 발견되는 7가지 취약점을 실제 코드 예시와 함께 살펴봅니다.</p>
+
+  <h2><span class="vuln-num">1</span> <span data-en="Hardcoded API Keys / Passwords" data-ko="하드코딩된 API 키 / 비밀번호">하드코딩된 API 키 / 비밀번호</span></h2>
+  <p>AI는 "빠르게 작동하는 예제"를 보여주기 위해 자주 API 키를 코드에 직접 넣습니다. 이 코드가 GitHub에 올라가는 순간 키가 유출됩니다.</p>
+
+  <pre class="bad"><code># AI가 생성한 코드 (취약)
+OPENAI_API_KEY = "sk-proj-abc123xyz..."
+RESEND_API_KEY = "re_f4Pkdvz1_PEm52d5..."
+
+response = openai.ChatCompletion.create(
+    api_key=OPENAI_API_KEY,
+    model="gpt-4"
+)</code></pre>
+
+  <pre class="good"><code># 안전한 버전
+import os
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise ValueError("OPENAI_API_KEY environment variable not set")
+
+response = openai.ChatCompletion.create(
+    api_key=OPENAI_API_KEY,
+    model="gpt-4"
+)</code></pre>
+
+  <div class="callout tip">
+    <strong>✓ 해결책:</strong> 모든 시크릿은 환경변수로. <code>.env</code> 파일에 저장하고 <code>.gitignore</code>에 추가하세요. Railway, Vercel 등 플랫폼의 환경변수 기능을 사용하세요.
+  </div>
+
+  <h2><span class="vuln-num">2</span> <span data-en="CORS Wildcard — All Origins Allowed" data-ko="CORS 와일드카드 — 모든 출처 허용">CORS 와일드카드 — 모든 출처 허용</span></h2>
+  <p>AI는 CORS 오류 해결을 위해 종종 모든 출처를 허용하는 설정을 제안합니다. 프로덕션에서 이렇게 설정하면 모든 도메인에서 API에 접근할 수 있습니다.</p>
+
+  <pre class="bad"><code># AI가 생성한 코드 (취약) — FastAPI 예시
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # 모든 출처 허용!
+    allow_methods=["*"],
+    allow_headers=["*"],
+)</code></pre>
+
+  <pre class="good"><code># 안전한 버전 — 신뢰하는 도메인만 허용
+ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,  # ["https://myapp.com"]
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization"],
+)</code></pre>
+
+  <h2><span class="vuln-num">3</span> <span data-en="JWT Signature Verification Disabled" data-ko="JWT 서명 검증 비활성화">JWT 서명 검증 비활성화</span></h2>
+  <p>"일단 작동만 하게" 만들기 위해 AI가 JWT 검증을 끄는 경우가 있습니다. 이렇게 하면 누구나 임의의 JWT 토큰을 위조할 수 있습니다.</p>
+
+  <pre class="bad"><code># AI가 생성한 코드 (취약)
+payload = jwt.decode(
+    token,
+    key,
+    algorithms=["HS256"],
+    options={"verify_signature": False}  # 서명 검증 비활성화!
+)</code></pre>
+
+  <pre class="good"><code># 안전한 버전
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+payload = jwt.decode(
+    token,
+    SECRET_KEY,
+    algorithms=["HS256"]
+    # verify_signature는 기본값 True — 건드리지 마세요
+)</code></pre>
+
+  <h2><span class="vuln-num">4</span> <span data-en="Hardcoded os.getenv() Fallback" data-ko="os.getenv() 폴백 하드코딩">os.getenv() 폴백 하드코딩</span></h2>
+  <p>이건 많은 개발자가 놓치는 패턴입니다. "환경변수가 없을 때를 대비해" 폴백 값을 넣으면, 환경변수가 설정되지 않은 경우 하드코딩된 값이 그대로 사용됩니다.</p>
+
+  <pre class="bad"><code># 취약 — 환경변수가 없으면 실제 키가 사용됨
+API_KEY = os.getenv("API_KEY", "sk-prod-real-key-here")</code></pre>
+
+  <pre class="good"><code># 안전 — 환경변수 없으면 에러 발생 (의도적)
+API_KEY = os.getenv("API_KEY")
+assert API_KEY, "API_KEY environment variable is required"</code></pre>
+
+  <h2><span class="vuln-num">5</span> <span data-en="Debug Mode Enabled" data-ko="디버그 모드 활성화">디버그 모드 활성화</span></h2>
+
+  <pre class="bad"><code># AI 예제 코드에 자주 등장 (취약)
+app.run(debug=True, host="0.0.0.0")</code></pre>
+
+  <pre class="good"><code># 환경변수로 제어
+DEBUG = os.getenv("DEBUG", "false").lower() == "true"
+app.run(debug=DEBUG, host="0.0.0.0" if DEBUG else "127.0.0.1")</code></pre>
+
+  <h2><span class="vuln-num">6</span> <span data-en="SQL Injection — Direct String Insertion" data-ko="SQL 인젝션 — 문자열 직접 삽입">SQL 인젝션 — 문자열 직접 삽입</span></h2>
+
+  <pre class="bad"><code># AI가 생성한 코드 (취약)
+user_id = request.args.get("id")
+query = f"SELECT * FROM users WHERE id = {user_id}"
+cursor.execute(query)  # SQL 인젝션 가능!</code></pre>
+
+  <pre class="good"><code># 파라미터화된 쿼리 사용
+user_id = request.args.get("id")
+cursor.execute("SELECT * FROM users WHERE id = %s", (user_id,))</code></pre>
+
+  <h2><span class="vuln-num">7</span> <span data-en="Unsafe Deserialization (pickle/yaml.load)" data-ko="안전하지 않은 역직렬화 (pickle/yaml.load)">안전하지 않은 역직렬화 (pickle/yaml.load)</span></h2>
+
+  <pre class="bad"><code># 취약 — 신뢰할 수 없는 데이터로 역직렬화
+import yaml
+config = yaml.load(user_input)  # 임의 코드 실행 가능!
+
+import pickle
+obj = pickle.loads(user_data)   # 위험!</code></pre>
+
+  <pre class="good"><code># 안전 — yaml.safe_load 사용
+config = yaml.safe_load(user_input)
+
+# pickle은 신뢰할 수 있는 데이터에만, 또는 json 사용
+import json
+obj = json.loads(user_data)</code></pre>
+
+  <h2 data-en="Scan Your Code Right Now" data-ko="내 코드 바로 검사하기">내 코드 바로 검사하기</h2>
+  <p>CyberShield의 코드 파일 스캔 기능으로 위 7가지 취약점을 포함해 14가지 패턴을 즉시 탐지할 수 있습니다. Python, JavaScript, TypeScript, Go 등을 지원합니다.</p>
+
+  <div class="scan-cta">
+    <div>
+      <strong style="font-size:1rem" data-en="Code File Security Scan — Free" data-ko="내 코드 파일 보안 검사 — 무료">내 코드 파일 보안 검사 — 무료</strong>
+      <p style="font-size:13px;color:var(--text2);margin-top:.25rem" data-en="Upload file → 30 seconds → vulnerability location + fix guide" data-ko="파일 업로드 → 30초 → 취약점 위치 + 수정 방법까지">파일 업로드 → 30초 → 취약점 위치 + 수정 방법까지</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔍 Code File Scan" data-ko="🔍 코드 파일 스캔">🔍 코드 파일 스캔</a>
+  </div>
+
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고 (AdSense 승인 후 활성화)">광고 (AdSense 승인 후 활성화)</div>
+
+  <p style="font-size:13px;color:var(--text3);border-top:1px solid var(--border);padding-top:1.25rem;margin-top:2rem">
+    관련 글: <a href="/blog/ssl-guide">SSL 인증서 무료 자동 갱신 가이드</a> · <a href="/blog/dmarc-guide">이메일 스푸핑 방지 SPF·DKIM·DMARC 가이드</a>
+  </p>
+</div>
+
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/" data-en="Home" data-ko="홈">홈</a> · <a href="/privacy" data-en="Privacy Policy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l=localStorage.getItem('cs_lang')||'ko';
+  window._setLang=function(lang){
+    localStorage.setItem('cs_lang',lang);
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      const txt=el.getAttribute('data-'+lang);
+      if(txt===null)return;
+      if(el.tagName==='INPUT')el.placeholder=txt;
+      else el.innerHTML=txt;
+    });
+    document.documentElement.lang=lang;
+    const t=document.querySelector('title');
+    if(t&&t.getAttribute('data-'+lang))t.textContent=t.getAttribute('data-'+lang);
+  };
+  document.addEventListener('DOMContentLoaded',()=>_setLang(l));
+})();
+</script>
+</body>
+</html>

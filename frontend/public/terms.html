@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이용약관 | Terms of Service | CyberShield</title>
+<meta name="description" content="CyberShield 서비스 이용약관">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:"Space Mono",monospace;--sans:"DM Sans",sans-serif;--r:10px;--r2:14px}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;min-height:100vh}
+nav{display:flex;align-items:center;gap:.75rem;padding:0 1.5rem;height:56px;border-bottom:1px solid var(--border);background:rgba(8,12,16,.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.nav-back{font-size:12px;color:var(--text2);text-decoration:none;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+footer a{color:var(--accent)}
+
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+h1{font-size:1.8rem;font-weight:600;margin-bottom:.5rem}
+.meta{font-size:13px;color:var(--text3);margin-bottom:2.5rem;font-family:var(--mono)}
+h2{font-size:1.05rem;font-weight:600;color:var(--accent);margin:2rem 0 .75rem}
+p{color:var(--text2);margin-bottom:1rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.4rem}
+
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/" class="nav-back" data-en="← Home" data-ko="← 홈으로">← 홈으로</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+
+<div class="container">
+  <h1 data-en="Terms of Service" data-ko="이용약관">이용약관</h1>
+  <div class="meta" data-en="Terms of Service · Effective: April 10, 2026 · CyberShield" data-ko="이용약관 · 시행일: 2026년 4월 10일 · CyberShield">이용약관 · 시행일: 2026년 4월 10일</div>
+
+  <h2 data-en="Article 1 (Purpose)" data-ko="제1조 (목적)">제1조 (목적)</h2>
+  <p data-en="These Terms govern the conditions and procedures for using all services provided by CyberShield, including rights, obligations, and responsibilities of users and the service."
+     data-ko="본 약관은 CyberShield(이하 '서비스')가 제공하는 웹사이트 보안 스캔, 에이전트 모니터링 및 관련 부가 서비스의 이용 조건과 절차, 이용자와 서비스의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.">본 약관은 CyberShield가 제공하는 서비스의 이용 조건을 규정합니다.</p>
+
+  <h2 data-en="Article 2 (Definitions)" data-ko="제2조 (정의)">제2조 (정의)</h2>
+  <ul>
+    <li data-en="<strong>'Service'</strong> means all CyberShield features including web security scanning, code analysis, and real-time monitoring agents."
+        data-ko="<strong>'서비스'</strong>란 CyberShield가 제공하는 웹사이트 보안 스캔, 코드 분석, 실시간 모니터링 에이전트 및 관련 부가 서비스 일체를 의미합니다."><strong>'서비스'</strong>란 CyberShield가 제공하는 모든 기능을 의미합니다.</li>
+    <li data-en="<strong>'User'</strong> means any individual or legal entity accessing the service under these Terms."
+        data-ko="<strong>'이용자'</strong>란 서비스에 접속하여 본 약관에 따라 서비스를 이용하는 모든 개인 및 법인을 말합니다."><strong>'이용자'</strong>란 서비스를 이용하는 모든 개인 및 법인을 말합니다.</li>
+    <li data-en="<strong>'Agent'</strong> means the software installed on the user's server or PC that detects and reports security events in real time."
+        data-ko="<strong>'에이전트'</strong>란 이용자의 서버 또는 PC에 설치되어 실시간 보안 이벤트를 감지하고 보고하는 소프트웨어를 의미합니다."><strong>'에이전트'</strong>란 설치되는 보안 모니터링 소프트웨어를 의미합니다.</li>
+  </ul>
+
+  <h2 data-en="Article 3 (Effectiveness and Changes)" data-ko="제3조 (약관의 효력 및 변경)">제3조 (약관의 효력 및 변경)</h2>
+  <p data-en="These Terms take effect upon publication on the website. CyberShield may amend these Terms as needed, and amendments take effect 7 days after notice."
+     data-ko="본 약관은 서비스 웹사이트에 공시함으로써 효력이 발생합니다. 변경된 약관은 공지 후 7일이 경과한 시점부터 효력이 발생합니다.">약관은 웹사이트 공시 시 효력이 발생하며, 변경 후 7일 뒤 적용됩니다.</p>
+
+  <h2 data-en="Article 4 (Services Provided)" data-ko="제4조 (서비스의 제공)">제4조 (서비스의 제공)</h2>
+  <ul>
+    <li data-en="Domain security scan (SSL/TLS, HTTP headers, email security, DNS, ports, malware)" data-ko="도메인 보안 스캔 (SSL/TLS, HTTP 헤더, 이메일 보안, DNS, 포트, 악성코드 확인)">도메인 보안 스캔</li>
+    <li data-en="Source code security vulnerability analysis" data-ko="소스 코드 보안 취약점 분석">소스 코드 보안 취약점 분석</li>
+    <li data-en="Email security report delivery" data-ko="이메일 보안 리포트 발송">이메일 보안 리포트 발송</li>
+    <li data-en="Real-time monitoring agent (Plus/Max plans)" data-ko="실시간 모니터링 에이전트 (Plus/Max 플랜)">실시간 모니터링 에이전트</li>
+    <li data-en="Security event alerts (Slack, email, KakaoTalk)" data-ko="보안 이벤트 알림 (Slack, 이메일, 카카오)">보안 이벤트 알림</li>
+  </ul>
+
+  <h2 data-en="Article 5 (User Obligations)" data-ko="제5조 (이용자의 의무)">제5조 (이용자의 의무)</h2>
+  <ul>
+    <li data-en="Users must comply with these Terms and applicable laws." data-ko="이용자는 본 약관 및 관련 법령을 준수해야 합니다.">관련 법령 및 약관 준수</li>
+    <li data-en="Users may only scan domains and code <strong>they own or have management authority over</strong>. Unauthorized scanning of third-party systems is strictly prohibited."
+        data-ko="이용자는 <strong>자신이 소유하거나 관리 권한이 있는 도메인 및 코드</strong>에 대해서만 스캔을 수행해야 합니다.">자신이 소유한 도메인/코드만 스캔 가능</li>
+    <li data-en="Scan results and reports must be used only for personal security improvement; they must not be misused for third-party attacks."
+        data-ko="스캔 결과 및 리포트는 개인 보안 개선 목적으로만 사용해야 합니다.">스캔 결과의 악용 금지</li>
+  </ul>
+
+  <h2 data-en="Article 6 (Service Restriction)" data-ko="제6조 (서비스 이용 제한)">제6조 (서비스 이용 제한)</h2>
+  <p data-en="CyberShield may restrict service without prior notice in cases of unauthorized scanning of third-party systems, disruption of normal service operations, or violations of applicable laws."
+     data-ko="서비스는 타인의 시스템 무단 스캔, 서비스 운영 방해, 관련 법령 위반 시 사전 통보 없이 이용을 제한할 수 있습니다.">법령 위반, 서비스 방해 등의 경우 이용이 제한될 수 있습니다.</p>
+
+  <h2 data-en="Article 7 (Fees and Payment)" data-ko="제7조 (요금 및 결제)">제7조 (요금 및 결제)</h2>
+  <ul>
+    <li data-en="Basic scanning service is provided free of charge." data-ko="기본 스캔 서비스는 무료로 제공됩니다.">기본 스캔 서비스 무료</li>
+    <li data-en="Plus plan ($49/month) and Max plan ($149/month) are paid subscription services." data-ko="Plus 플랜($49/월), Max 플랜($149/월)은 유료 구독 서비스입니다.">유료 플랜: Plus $49/월, Max $149/월</li>
+    <li data-en="Cancellation must be requested before the next billing cycle; already paid amounts are non-refundable." data-ko="구독 취소는 다음 청구 주기 전에 요청해야 하며, 이미 결제된 금액은 환불되지 않습니다.">이미 결제된 금액은 환불되지 않습니다.</li>
+  </ul>
+
+  <h2 data-en="Article 8 (Copyright)" data-ko="제8조 (저작권)">제8조 (저작권)</h2>
+  <p data-en="All content, software, and design within the service is owned by CyberShield. Unauthorized reproduction, distribution, or modification is prohibited."
+     data-ko="서비스 내 모든 콘텐츠, 소프트웨어, 디자인의 저작권은 CyberShield에 있으며, 무단 복제·배포·수정을 금지합니다.">서비스 내 모든 콘텐츠의 저작권은 CyberShield에 있습니다.</p>
+
+  <h2 data-en="Article 9 (Disclaimer)" data-ko="제9조 (면책 조항)">제9조 (면책 조항)</h2>
+  <ul>
+    <li data-en="Scan results are for reference only. CyberShield is not responsible for decisions made based on scan results." data-ko="서비스의 보안 스캔 결과는 참고용이며, 스캔 결과를 기반으로 한 결정에 대해 서비스는 책임을 지지 않습니다.">스캔 결과는 참고용입니다.</li>
+    <li data-en="The service is automated and may not detect all vulnerabilities. Professional security audits are recommended for critical systems." data-ko="서비스는 자동화된 도구이므로 모든 취약점을 발견하지 못할 수 있습니다.">모든 취약점을 탐지하지 못할 수 있습니다.</li>
+    <li data-en="CyberShield is not responsible for service interruptions due to force majeure such as natural disasters or server failures." data-ko="천재지변, 서버 장애 등 불가항력으로 인한 서비스 중단에 대해 책임을 지지 않습니다.">불가항력에 의한 중단은 책임지지 않습니다.</li>
+  </ul>
+
+  <h2 data-en="Article 10 (Advertising)" data-ko="제10조 (광고)">제10조 (광고)</h2>
+  <p data-en="CyberShield may display advertisements through Google AdSense and similar services. We are not responsible for transactions between users and advertisers."
+     data-ko="서비스는 Google AdSense 등을 통한 광고를 게재할 수 있으며, 광고로 인해 발생한 이용자와 광고주 간의 거래에 대해 서비스는 책임을 지지 않습니다.">Google AdSense 등을 통한 광고를 게재할 수 있습니다.</p>
+
+  <h2 data-en="Article 11 (Dispute Resolution)" data-ko="제11조 (분쟁 해결)">제11조 (분쟁 해결)</h2>
+  <p data-en="Disputes related to these Terms shall be governed by the laws of the Republic of Korea, with the Seoul Central District Court having jurisdiction."
+     data-ko="본 약관과 관련하여 분쟁이 발생한 경우 대한민국 법률을 적용하며, 관할 법원은 서울중앙지방법원으로 합니다.">분쟁 시 대한민국 법률 적용, 관할 법원은 서울중앙지방법원입니다.</p>
+
+  <h2 data-en="Article 12 (Contact)" data-ko="제12조 (문의)">제12조 (문의)</h2>
+  <p data-en='For service inquiries: <a href="mailto:general@jihun.me">general@jihun.me</a>'
+     data-ko='서비스 이용 관련 문의: <a href="mailto:general@jihun.me">general@jihun.me</a>'>서비스 이용 관련 문의: <a href="mailto:general@jihun.me">general@jihun.me</a></p>
+</div>
+
+<footer>
+  © 2026 CyberShield ·
+  <a href="/">Home</a> ·
+  <a href="/privacy" data-en="Privacy Policy" data-ko="개인정보처리방침">개인정보처리방침</a> ·
+  <a href="/terms" data-en="Terms" data-ko="이용약관">이용약관</a> ·
+  <a href="/contact" data-en="Contact" data-ko="문의">문의</a>
+</footer>
+<script>
+(function(){
+  const l = localStorage.getItem('cs_lang') || 'ko';
+  window._setLang = function(lang) {
+    localStorage.setItem('cs_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('on', b.dataset.l === lang));
+    document.querySelectorAll('[data-en]').forEach(el => {
+      const txt = el.getAttribute('data-' + lang);
+      if (txt === null) return;
+      if (el.tagName === 'INPUT') el.placeholder = txt;
+      else el.innerHTML = txt;
+    });
+    document.documentElement.lang = lang;
+  };
+  _setLang(l);
+})();
+</script>
+</body>
+</html>

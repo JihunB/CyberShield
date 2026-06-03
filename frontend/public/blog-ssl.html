@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-en="SSL Certificate Expiry Guide — Free Auto-Renewal | CyberShield" data-ko="SSL 인증서 만료 시 어떻게 되나? 무료 자동 갱신 완전 가이드 | CyberShield">SSL 인증서 만료 시 어떻게 되나? | CyberShield</title>
+<meta name="description" content="SSL 인증서가 만료되면 방문자에게 보안 경고가 뜨고 매출이 급감합니다. Let's Encrypt 무료 인증서 자동 갱신 설정법과 만료 전 체크리스트를 알아보세요.">
+<meta property="og:title" content="SSL 인증서 만료 시 어떻게 되나? 무료 자동 갱신 완전 가이드">
+<meta property="og:description" content="SSL 만료로 방문자 차단되기 전에 — Let's Encrypt 무료 인증서 자동 갱신 설정 5분 완성">
+<meta property="og:image" content="https://digitalcybershield.com/images/blog/blog-ssl.svg">
+<link rel="canonical" href="https://digitalcybershield.com/blog/ssl-guide">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080c10;--bg2:#0d1319;--bg3:#111820;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#dce4ee;--text2:#8a9ab0;--text3:#4a5a6a;--accent:#00e5a0;--danger:#ff4d6a;--warn:#ffb547;--mono:'Space Mono',monospace;--sans:'DM Sans',sans-serif}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7}
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:56px;background:rgba(8,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--mono);font-size:14px;color:var(--accent);display:flex;align-items:center;gap:7px;text-decoration:none}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.container{max-width:720px;margin:0 auto;padding:3rem 1.5rem 5rem}
+.post-tag{display:inline-block;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.1em;padding:3px 9px;border-radius:4px;background:rgba(0,229,160,.1);color:var(--accent);border:1px solid rgba(0,229,160,.2);margin-bottom:1rem}
+h1{font-size:clamp(1.6rem,4vw,2.2rem);font-weight:500;letter-spacing:-.02em;line-height:1.25;margin-bottom:.75rem}
+.meta{font-size:13px;color:var(--text3);font-family:var(--mono);margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+h2{font-size:1.2rem;font-weight:500;color:var(--text);margin:2.5rem 0 .875rem}
+h3{font-size:1rem;font-weight:500;color:var(--accent);margin:1.75rem 0 .625rem}
+p{color:var(--text2);margin-bottom:1.125rem;font-size:15px}
+ul,ol{color:var(--text2);margin:.5rem 0 1.25rem 1.5rem;font-size:15px}
+li{margin-bottom:.5rem}
+strong{color:var(--text);font-weight:500}
+code{font-family:var(--mono);font-size:12px;background:var(--bg3);border:1px solid var(--border2);padding:2px 7px;border-radius:4px;color:var(--accent)}
+pre{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.25rem;overflow-x:auto;margin:1.25rem 0}
+pre code{background:none;border:none;padding:0;font-size:13px;color:#a8d8b8}
+.callout{padding:1rem 1.25rem;border-radius:10px;margin:1.5rem 0;font-size:14px;line-height:1.6}
+.callout.warn{background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.25);color:var(--warn)}
+.callout.tip{background:rgba(0,229,160,.06);border:1px solid rgba(0,229,160,.18);color:var(--accent)}
+.callout.danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.2);color:var(--danger)}
+.scan-cta{background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.15);border-radius:14px;padding:1.5rem 1.75rem;margin:2.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap}
+.scan-cta h3{color:var(--text);margin:0 0 .25rem}
+.scan-cta p{font-size:13px;color:var(--text2);margin:0}
+.btn-scan{display:inline-flex;align-items:center;gap:7px;background:var(--accent);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:700;padding:10px 20px;border-radius:10px;text-decoration:none;white-space:nowrap;transition:background .2s}
+.btn-scan:hover{background:#00ffb3}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.ad-banner{background:var(--bg2);border:1px dashed var(--border2);border-radius:10px;height:90px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text3);font-family:var(--mono);margin:2rem 0}
+footer{text-align:center;padding:2rem;font-size:12px;color:var(--text3);border-top:1px solid var(--border);margin-top:4rem}
+
+.lang-toggle{display:flex;gap:2px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:6px;overflow:hidden;margin-left:auto}
+.lang-btn{padding:4px 10px;font-size:11px;font-family:var(--mono);background:transparent;border:none;color:var(--text2);cursor:pointer;transition:all .2s}
+.lang-btn.on{background:var(--accent);color:var(--bg);font-weight:700}
+
+.post-thumb{
+  width:100%;aspect-ratio:1200/630;
+  border-radius:var(--r2,12px);
+  margin-bottom:2rem;
+  border:1px solid rgba(255,255,255,0.07);
+  display:block;overflow:hidden;
+  object-fit:cover;
+}
+.post-thumb img,.post-thumb svg{width:100%;height:100%;display:block;}
+
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="logo"><span class="logo-dot"></span>CyberShield</a>
+  <a href="/blog" class="nav-back" style="font-size:12px;color:var(--text2);text-decoration:none" data-en="← Blog" data-ko="← 블로그">← Blog</a>
+  <div class="lang-toggle">
+    <button class="lang-btn" data-l="en" onclick="_setLang('en')">EN</button>
+    <button class="lang-btn on" data-l="ko" onclick="_setLang('ko')">KO</button>
+  </div>
+</nav>
+
+<div class="container">
+  <span class="post-tag" data-en="SSL / HTTPS" data-ko="SSL / HTTPS">SSL / HTTPS</span>
+  <h1 data-en="What Happens When Your SSL Certificate Expires?<br>Free Auto-Renewal Complete Guide" data-ko="내 웹사이트 SSL 인증서가 만료되면 어떻게 되나요?<br>무료 자동 갱신 완전 가이드">내 웹사이트 SSL 인증서가 만료되면 어떻게 되나요?<br>무료 자동 갱신 완전 가이드</h1>
+  <div class="meta" data-en="2026.04.10 · 5 min read · CyberShield" data-ko="2026.04.10 · 5분 읽기 · CyberShield">2026.04.10 · 5 min read · CyberShield</div>
+<div class="post-thumb">
+  <img src="/images/blog/blog-ssl.svg"
+       alt="SSL 인증서 자동 갱신 가이드"
+       width="1200" height="630"
+       loading="eager"
+       style="width:100%;height:100%;object-fit:cover;border-radius:var(--r2,12px)">
+</div>
+
+
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고 (AdSense 승인 후 활성화)">광고 (AdSense 승인 후 활성화)</div>
+
+  <p data-en="Imagine your visitors suddenly seeing a red warning: <strong>&quot;This site is not secure.&quot;</strong> That's what happens when your SSL certificate expires. Most people simply leave. SSL expiry can cost tens of thousands of won in lost revenue." data-ko="어느 날 갑자기 사이트에 접속하니 브라우저가 <strong>&quot;이 사이트는 안전하지 않습니다&quot;</strong> 라는 빨간 경고창을 보여준다면? SSL 인증서가 만료된 것입니다. 대부분의 사람들이 그냥 떠나버립니다.">어느 날 갑자기 사이트에 접속하니 브라우저가 <strong>"이 사이트는 안전하지 않습니다"</strong> 라는 빨간 경고창을 보여준다면? SSL 인증서가 만료된 것입니다.</p>
+
+  <div class="callout danger">
+    <strong>⚠ SSL 만료 시 발생하는 일:</strong><br>
+    • Chrome·Firefox·Safari 모두 빨간 경고창 표시<br>
+    • "Not Secure" 표시로 방문자의 80%가 이탈<br>
+    • 구글 검색 순위 하락 (HTTPS는 SEO 랭킹 요소)<br>
+    • 온라인 결제 불가 (카드사가 비HTTPS 사이트 차단)
+  </div>
+
+  <h2 data-en="What Is an SSL Certificate?" data-ko="SSL 인증서란 무엇인가요?">SSL 인증서란 무엇인가요?</h2>
+  <p>SSL(Secure Sockets Layer) 인증서는 웹사이트와 방문자 사이의 데이터를 <strong>암호화</strong>하는 디지털 증명서입니다. 주소창의 자물쇠 아이콘이 바로 SSL이 작동 중이라는 표시입니다.</p>
+  <p>인증서에는 유효 기간이 있습니다. Let's Encrypt 무료 인증서는 <strong>90일</strong>, 유료 인증서는 보통 1~2년입니다. 유효 기간이 지나면 브라우저가 자동으로 경고를 표시합니다.</p>
+
+  <h2 data-en="Check Your SSL Expiry Date" data-ko="내 사이트 SSL 남은 기간 확인하기">내 사이트 SSL 남은 기간 확인하기</h2>
+  <p>가장 쉬운 방법은 CyberShield 무료 스캔을 이용하는 것입니다. 도메인을 입력하면 SSL 만료 일자, 발급 기관, TLS 버전까지 한 번에 확인할 수 있습니다.</p>
+
+  <div class="scan-cta">
+    <div>
+      <h3 style="font-size:1rem;font-weight:500;margin-bottom:.25rem" data-en="Check Your SSL Expiry Date Now" data-ko="지금 바로 SSL 만료 일자 확인하기">지금 바로 SSL 만료 일자 확인하기</h3>
+      <p data-en="Domain → 30 seconds → SSL score + expiry date + config issues" data-ko="도메인 입력 → 30초 → SSL 점수 + 만료일 + 설정 문제까지">도메인 입력 → 30초 → SSL 점수 + 만료일 + 설정 문제까지</p>
+    </div>
+    <a href="/" class="btn-scan" data-en="🔒 Free SSL Check" data-ko="🔒 무료 SSL 검사">🔒 무료 SSL 검사</a>
+  </div>
+
+  <h2 data-en="Let's Encrypt — Free SSL Auto-Renewal" data-ko="Let's Encrypt — 무료 SSL 자동 갱신 설정">Let's Encrypt — 무료 SSL 자동 갱신 설정</h2>
+  <p><strong>Let's Encrypt</strong>는 Mozilla 재단이 만든 무료 SSL 인증 기관입니다. 90일마다 자동 갱신되도록 설정하면 더 이상 만료 걱정이 없습니다.</p>
+
+  <h3 data-en="Method 1: Certbot Auto-Renewal (Linux)" data-ko="방법 1: Certbot으로 자동 갱신 (Linux 서버)">방법 1: Certbot으로 자동 갱신 (Linux 서버)</h3>
+  <pre><code># Certbot 설치 (Ubuntu/Debian)
+sudo apt install certbot python3-certbot-nginx
+
+# 인증서 발급 + Nginx 자동 설정
+sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+
+# 자동 갱신 테스트
+sudo certbot renew --dry-run
+
+# cron으로 자동 갱신 (2일마다 확인)
+echo "0 12 */2 * * root certbot renew --quiet" | sudo tee /etc/cron.d/certbot</code></pre>
+
+  <div class="callout tip">
+    <strong>✓ 설정 완료 후 확인:</strong> <code>sudo certbot certificates</code> 명령어로 인증서 목록과 만료일을 확인할 수 있습니다.
+  </div>
+
+  <h3 data-en="Method 2: Cloudflare (All Platforms, Easiest)" data-ko="방법 2: Cloudflare (모든 플랫폼, 가장 쉬움)">방법 2: Cloudflare (모든 플랫폼, 가장 쉬움)</h3>
+  <ol>
+    <li>cloudflare.com에서 무료 계정 생성</li>
+    <li>도메인을 Cloudflare에 추가 (DNS 서버 변경 필요)</li>
+    <li>SSL/TLS 탭 → "Full (strict)" 선택</li>
+    <li>Edge Certificates → 자동 갱신 활성화</li>
+  </ol>
+  <p>Cloudflare는 SSL 갱신을 자동으로 처리하며, CDN·DDoS 방어도 무료로 제공합니다.</p>
+
+  <h3 data-en="Method 3: Hosting Platform Auto-Renewal" data-ko="방법 3: 호스팅 업체 자동 갱신">방법 3: 호스팅 업체 자동 갱신</h3>
+  <p>Vercel, Netlify, Railway 등 최신 호스팅 플랫폼은 SSL을 자동으로 발급하고 갱신합니다. 별도 설정이 필요 없습니다.</p>
+
+  <h2 data-en="HSTS — Strengthen Your SSL" data-ko="HSTS — SSL을 더 강하게 만드는 설정">HSTS — SSL을 더 강하게 만드는 설정</h2>
+  <p>SSL 인증서가 있어도 HTTP로 접속하면 암호화가 없습니다. <strong>HSTS(HTTP Strict Transport Security)</strong>를 설정하면 브라우저가 항상 HTTPS로만 접속합니다.</p>
+
+  <pre><code># Nginx 설정에 추가
+add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" always;
+
+# Apache 설정에 추가
+Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"</code></pre>
+
+  <div class="callout warn">
+    <strong>⚠ 주의:</strong> HSTS preload 설정 전에 모든 서브도메인이 HTTPS를 지원하는지 반드시 확인하세요. 한번 설정하면 되돌리기 어렵습니다.
+  </div>
+
+  <h2 data-en="SSL Pre-Expiry Checklist" data-ko="SSL 만료 전 체크리스트">SSL 만료 전 체크리스트</h2>
+  <ul>
+    <li>✓ 인증서 만료일 확인 (30일 전부터 준비)</li>
+    <li>✓ 자동 갱신 설정 확인 (<code>certbot renew --dry-run</code>)</li>
+    <li>✓ 갱신 실패 시 이메일 알림 설정</li>
+    <li>✓ HSTS 헤더 설정</li>
+    <li>✓ HTTP → HTTPS 리다이렉트 설정</li>
+    <li>✓ Mixed Content (HTTP 리소스) 없는지 확인</li>
+  </ul>
+
+  <div class="scan-cta">
+    <div>
+      <h3 style="font-size:1rem;font-weight:500;margin-bottom:.25rem">SSL 외에 다른 보안 문제도 있지 않을까요?</h3>
+      <p>DMARC, 오픈 포트, 악성코드까지 — 30초 무료 전체 검사</p>
+    </div>
+    <a href="/" class="btn-scan">🔍 전체 보안 검사</a>
+  </div>
+
+  <div class="ad-banner" data-en="Advertisement" data-ko="광고 (AdSense 승인 후 활성화)">광고 (AdSense 승인 후 활성화)</div>
+
+  <p style="font-size:13px;color:var(--text3);border-top:1px solid var(--border);padding-top:1.25rem;margin-top:2rem">
+    관련 글: <a href="/blog/dmarc-guide">이메일 스푸핑 방지 — SPF·DKIM·DMARC 설정 가이드</a> · <a href="/blog/ai-code-security">AI 생성 코드의 7가지 보안 취약점</a>
+  </p>
+</div>
+
+<footer>© 2026 CyberShield · <a href="/blog" data-en="Blog" data-ko="블로그">블로그</a> · <a href="/" data-en="Home" data-ko="홈">홈</a> · <a href="/privacy" data-en="Privacy Policy" data-ko="개인정보처리방침">개인정보처리방침</a></footer>
+<script>
+(function(){
+  const l=localStorage.getItem('cs_lang')||'ko';
+  window._setLang=function(lang){
+    localStorage.setItem('cs_lang',lang);
+    document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('on',b.dataset.l===lang));
+    document.querySelectorAll('[data-en]').forEach(el=>{
+      const txt=el.getAttribute('data-'+lang);
+      if(txt===null)return;
+      if(el.tagName==='INPUT')el.placeholder=txt;
+      else el.innerHTML=txt;
+    });
+    document.documentElement.lang=lang;
+    const t=document.querySelector('title');
+    if(t&&t.getAttribute('data-'+lang))t.textContent=t.getAttribute('data-'+lang);
+  };
+  document.addEventListener('DOMContentLoaded',()=>_setLang(l));
+})();
+</script>
+</body>
+</html>
