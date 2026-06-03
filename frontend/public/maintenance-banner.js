@@ -22,14 +22,11 @@
   banner.innerHTML = `
     <span style="font-size:16px;margin-right:8px;">🔧</span>
     <span>
-      <strong>Demo Mode — Backend Offline</strong>
+      <strong>Under Maintenance</strong>
       &nbsp;·&nbsp;
       The scan engine (Railway) and database (Supabase) are currently paused.
-      Scans will return an error. This project is preserved for portfolio purposes.
+      Scans will return an error.
       &nbsp;
-      <a href="https://jihun.me/cybershield.html" target="_blank" style="color:#2dd4bf;text-decoration:underline;font-weight:600;">
-        View full write-up →
-      </a>
     </span>
     <button onclick="document.getElementById('maintenance-banner').style.display='none'"
       style="margin-left:auto;background:none;border:none;color:#8b949e;cursor:pointer;font-size:18px;line-height:1;padding:0 4px;flex-shrink:0;">
